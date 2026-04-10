@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C64 6502 Handy Helper V2.0</title>
+    <style>
+        :root {
+            --c64-blue: #352879;
+            --c64-light-blue: #6c5eb5;
+            --c64-white: #ffffff;
+            --c64-text: #a397ff;
+            --c64-illegal: #ffb700;
+            --c64-green: #00ff41;
+            --c64-dim: rgba(108,94,181,0.15);
+        }
+        * { box-sizing: border-box; }
+        body {
+            background-color: var(--c64-blue);
+            color: var(--c64-light-blue);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.4;
+        }
+        header {
+            text-align: center;
+            border: 4px solid var(--c64-light-blue);
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 { color: var(--c64-white); text-transform: uppercase; margin: 5px 0; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        nav { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        button {
+            background-color: var(--c64-light-blue);
+            color: var(--c64-blue);
+            border: none;
+            padding: 9px 13px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.85em;
+        }
+        button:hover { background-color: var(--c64-white); }
+        button.active { background-color: var(--c64-white); box-shadow: 4px 4px 0 #000; }
+        .tab-content { display: none; border: 2px solid var(--c64-light-blue); padding: 20px; background: rgba(0,0,0,0.3); }
+        .tab-content.active { display: block; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.82em; }
+        th, td { border: 1px solid var(--c64-light-blue); padding: 6px 8px; text-align: left; }
+        th { background-color: var(--c64-light-blue); color: var(--c64-blue); position: sticky; top: 0; z-index: 2; font-size: 0.9em; }
+        tr:nth-child(even) { background: var(--c64-dim); }
+        .illegal { color: var(--c64-illegal); }
+        .illegal td { color: var(--c64-illegal); }
+        .code-block {
+            background: #000;
+            color: #0f0;
+            padding: 14px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', monospace;
+            margin-bottom: 18px;
+            border-left: 5px solid var(--c64-light-blue);
+            font-size: 0.88em;
+            line-height: 1.6;
+            white-space: pre;
+        }
+        .comment { color: #666; }
+        .label { color: #ffb700; }
+        .directive { color: #7ec8e3; }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            background: #000;
+            border: 2px solid var(--c64-light-blue);
+            color: var(--c64-white);
+            font-family: inherit;
+            font-size: 0.9em;
+        }
+        .scrollbox { max-height: 580px; overflow-y: auto; }
+        .ex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 800px) { .ex-grid { grid-template-columns: 1fr; } }
+        .ex-card {
+            border: 1px solid var(--c64-light-blue);
+            padding: 12px;
+            background: rgba(0,0,0,0.4);
+        }
+        .ex-card h3 { font-size: 0.9em; margin-bottom: 8px; color: var(--c64-text); }
+        .difficulty-simple { border-left: 4px solid #00ff41; }
+        .difficulty-intermediate { border-left: 4px solid #ffb700; }
+        .difficulty-advanced { border-left: 4px solid #ff4444; }
+        .diff-badge {
+            display: inline-block;
+            font-size: 0.7em;
+            padding: 2px 6px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+        .badge-simple { background: #00ff41; color: #000; }
+        .badge-intermediate { background: #ffb700; color: #000; }
+        .badge-advanced { background: #ff4444; color: #fff; }
+        .ex-filter { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+        .ex-filter span { color: var(--c64-text); font-size: 0.85em; }
+        .reg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin-top: 14px; }
+        .reg-card { border: 1px solid var(--c64-light-blue); padding: 14px; background: rgba(0,0,0,0.4); }
+        .reg-name { font-size: 1.4em; color: var(--c64-white); font-weight: bold; margin-bottom: 6px; }
+        .reg-bits { font-size: 0.8em; letter-spacing: 2px; margin-bottom: 8px; color: #ffb700; font-family: 'Courier New', monospace; }
+        .flag-row { display: flex; gap: 4px; margin-bottom: 10px; }
+        .flag-box { width: 28px; height: 28px; border: 1px solid var(--c64-light-blue); display: flex; align-items: center; justify-content: center; font-size: 0.8em; font-weight: bold; color: var(--c64-white); }
+        .flag-box.set { background: var(--c64-light-blue); color: var(--c64-blue); }
+        .flag-desc { font-size: 0.8em; color: var(--c64-text); margin: 2px 0; }
+        .addr-section { margin-bottom: 20px; }
+        .addr-title { color: var(--c64-white); font-size: 0.9em; text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px solid var(--c64-light-blue); padding-bottom: 4px; }
+        .chip-tag { display: inline-block; font-size: 0.7em; padding: 1px 5px; border: 1px solid; margin-right: 4px; }
+        .chip-vic { border-color: #ff6b6b; color: #ff6b6b; }
+        .chip-sid { border-color: #ffb700; color: #ffb700; }
+        .chip-cia { border-color: #00ff41; color: #00ff41; }
+        .chip-cpu { border-color: #7ec8e3; color: #7ec8e3; }
+        .chip-rom { border-color: #b388ff; color: #b388ff; }
+        .chip-ram { border-color: #888; color: #888; }
+        .mem-rw { font-size: 0.7em; padding: 1px 4px; }
+        .rw-r { color: #7ec8e3; }
+        .rw-w { color: #ff6b6b; }
+        .rw-rw { color: #00ff41; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>**** 6502 HANDY HELPER V2.0 ****</h1>
+        <p>64K RAM SYSTEM &nbsp; FULL HARDWARE REFERENCE &nbsp; C64 DEV MACHINE EDITION</p>
+    </header>
+
+    <nav>
+        <button class="tab-btn active" onclick="openTab(event,'Instructions')">Instructions (+Illegal)</button>
+        <button class="tab-btn" onclick="openTab(event,'Addressing')">Addressing Modes</button>
+        <button class="tab-btn" onclick="openTab(event,'Memory')">Full Memory Map</button>
+        <button class="tab-btn" onclick="openTab(event,'Registers')">Registers &amp; Flags</button>
+        <button class="tab-btn" onclick="openTab(event,'Examples')">Code Examples (30)</button>
+    </nav>
+
+    <!-- ===== INSTRUCTIONS TAB ===== -->
+    <div id="Instructions" class="tab-content active">
+        <h2>Complete 6502 Instruction Set</h2>
+        <p style="color:var(--c64-illegal);font-size:0.85em">* Orange = Undocumented (Illegal) Opcodes &nbsp;|&nbsp; Cycles shown for most common addressing mode</p>
+        <input type="text" id="insSearch" onkeyup="searchTable('insSearch','insTable')" placeholder="Search mnemonic, opcode hex, flags, or description...">
+        <div class="scrollbox">
+        <table id="insTable">
+            <thead><tr><th>Mnemonic</th><th>Opcode(s) Sample</th><th>Description</th><th>Modes</th><th>Flags</th><th>Cyc</th></tr></thead>
+            <tbody>
+<tr><td>ADC</td><td>$69 $65 $75 $6D $7D $79 $61 $71</td><td>Add Memory to Accumulator with Carry. A = A + M + C. Overflow set if sign changes incorrectly.</td><td>imm, zp, zp,X, abs, abs,X, abs,Y, (ind,X), (ind),Y</td><td>N V Z C</td><td>2-6</td></tr>
+<tr class="illegal"><td>ALR</td><td>$4B</td><td>AND #imm then LSR Accumulator. Effectively: A = (A AND #imm) >> 1. Carry gets old bit 0.</td><td>imm</td><td>N Z C</td><td>2</td></tr>
+<tr class="illegal"><td>ANC</td><td>$0B $2B</td><td>AND #imm into A, then copy bit 7 of result into Carry. Two opcodes, same behavior.</td><td>imm</td><td>N Z C</td><td>2</td></tr>
+<tr><td>AND</td><td>$29 $25 $35 $2D $3D $39 $21 $31</td><td>Logical AND of Accumulator with Memory. Result in A. Useful for masking bits.</td><td>imm, zp, zp,X, abs, abs,X, abs,Y, (ind,X), (ind),Y</td><td>N Z</td><td>2-6</td></tr>
+<tr class="illegal"><td>ANE</td><td>$8B</td><td>(A OR $EE) AND X AND #imm → A. Highly unstable, voltage/chip dependent. Avoid in production.</td><td>imm</td><td>N Z</td><td>2</td></tr>
+<tr class="illegal"><td>ARR</td><td>$6B</td><td>AND #imm into A, then ROR A. Carry and Overflow set in non-standard ways based on bits 6 and 7.</td><td>imm</td><td>N V Z C V</td><td>2</td></tr>
+<tr><td>ASL</td><td>$0A $06 $16 $0E $1E</td><td>Arithmetic Shift Left. Shifts all bits left one position. Bit 0 = 0, old bit 7 → Carry.</td><td>acc, zp, zp,X, abs, abs,X</td><td>N Z C</td><td>2-7</td></tr>
+<tr class="illegal"><td>AXS</td><td>$CB</td><td>(A AND X) - #imm → X. Sets flags as CMP would. Also known as SBX.</td><td>imm</td><td>N Z C</td><td>2</td></tr>
+<tr><td>BCC</td><td>$90</td><td>Branch if Carry Clear (C=0). Relative branch, range -128 to +127 bytes from next instruction.</td><td>rel</td><td>-</td><td>2-4</td></tr>
+<tr><td>BCS</td><td>$B0</td><td>Branch if Carry Set (C=1).</td><td>rel</td><td>-</td><td>2-4</td></tr>
+<tr><td>BEQ</td><td>$F0</td><td>Branch if Equal / Zero Set (Z=1). Taken after CMP when values match.</td><td>rel</td><td>-</td><td>2-4</td></tr>
+<tr><td>BIT</td><td>$24 $2C</td><td>Bit Test. AND A with M but only set flags: N←bit7, V←bit6 of M, Z←(A AND M)=0.</td><td>zp, abs</td><td>N V Z</td><td>3-4</td></tr>
+<tr><td>BMI</td><td>$30</td><td>Branch if Minus / Negative Set (N=1).</td><td>rel</td><td>-</td><td>2-4</td></tr>
+<tr><td>BNE</td><td>$D0</td><td>Branch if Not Equal / Zero Clear (Z=0). Workhorse of loop counters.</td><td>rel</td><td>-</td><td>2-4</td></tr>
+<tr><td>BPL</td><td>$10</td><td>Branch if Plus / Negative Clear (N=0).</td><td>rel</td><td>-</td><td>2-4</td></tr>
+<tr><td>BRK</td><td>$00</td><td>Force Software Break. Pushes PC+2 and P to stack with B set, jumps via $FFFE/$FFFF vector.</td><td>impl</td><td>B I</td><td>7</td></tr>
+<tr><td>BVC</td><td>$50</td><td>Branch if Overflow Clear (V=0).</td><td>rel</td><td>-</td><td>2-4</td></tr>
+<tr><td>BVS</td><td>$70</td><td>Branch if Overflow Set (V=1). Useful after signed arithmetic.</td><td>rel</td><td>-</td><td>2-4</td></tr>
+<tr><td>CLC</td><td>$18</td><td>Clear Carry Flag. Must do before ADC to avoid adding an unwanted 1.</td><td>impl</td><td>C</td><td>2</td></tr>
+<tr><td>CLD</td><td>$D8</td><td>Clear Decimal Mode Flag. Always call at startup on C64 (KERNAL may leave D set).</td><td>impl</td><td>D</td><td>2</td></tr>
+<tr><td>CLI</td><td>$58</td><td>Clear Interrupt Disable Flag. Enables IRQs. Use after fully setting up interrupt vectors.</td><td>impl</td><td>I</td><td>2</td></tr>
+<tr><td>CLV</td><td>$B8</td><td>Clear Overflow Flag.</td><td>impl</td><td>V</td><td>2</td></tr>
+<tr><td>CMP</td><td>$C9 $C5 $D5 $CD $DD $D9 $C1 $D1</td><td>Compare Accumulator with Memory. Subtracts M from A without storing result. Sets N,Z,C flags.</td><td>imm, zp, zp,X, abs, abs,X, abs,Y, (ind,X), (ind),Y</td><td>N Z C</td><td>2-6</td></tr>
+<tr><td>CPX</td><td>$E0 $E4 $EC</td><td>Compare X Register with Memory. Same as CMP but uses X.</td><td>imm, zp, abs</td><td>N Z C</td><td>2-4</td></tr>
+<tr><td>CPY</td><td>$C0 $C4 $CC</td><td>Compare Y Register with Memory. Same as CMP but uses Y.</td><td>imm, zp, abs</td><td>N Z C</td><td>2-4</td></tr>
+<tr class="illegal"><td>DCP</td><td>$C7 $D7 $CF $DF $DB $C3 $D3</td><td>DEC memory then CMP Accumulator with result. Combines two ops into one byte.</td><td>zp, zp,X, abs, abs,X, abs,Y, (ind,X), (ind),Y</td><td>N Z C</td><td>5-8</td></tr>
+<tr><td>DEC</td><td>$C6 $D6 $CE $DE</td><td>Decrement Memory by One. M = M - 1.</td><td>zp, zp,X, abs, abs,X</td><td>N Z</td><td>5-7</td></tr>
+<tr><td>DEX</td><td>$CA</td><td>Decrement X Register. X = X - 1. Wraps $00 → $FF.</td><td>impl</td><td>N Z</td><td>2</td></tr>
+<tr><td>DEY</td><td>$88</td><td>Decrement Y Register. Y = Y - 1.</td><td>impl</td><td>N Z</td><td>2</td></tr>
+<tr><td>EOR</td><td>$49 $45 $55 $4D $5D $59 $41 $51</td><td>Exclusive OR. Toggles bits in A. EOR #$FF inverts all bits. EOR with same value → 0.</td><td>imm, zp, zp,X, abs, abs,X, abs,Y, (ind,X), (ind),Y</td><td>N Z</td><td>2-6</td></tr>
+<tr class="illegal"><td>IGN</td><td>$04 $44 $64 $0C $1C $3C $5C $7C $DC $FC</td><td>Illegal NOP that reads from memory (causes bus cycle) but discards result. Also known as SKB/SKW.</td><td>zp, abs, abs,X</td><td>-</td><td>3-5</td></tr>
+<tr><td>INC</td><td>$E6 $F6 $EE $FE</td><td>Increment Memory by One. M = M + 1. Wraps $FF → $00.</td><td>zp, zp,X, abs, abs,X</td><td>N Z</td><td>5-7</td></tr>
+<tr><td>INX</td><td>$E8</td><td>Increment X Register. X = X + 1.</td><td>impl</td><td>N Z</td><td>2</td></tr>
+<tr><td>INY</td><td>$C8</td><td>Increment Y Register. Y = Y + 1.</td><td>impl</td><td>N Z</td><td>2</td></tr>
+<tr class="illegal"><td>ISC</td><td>$E7 $F7 $EF $FF $FB $E3 $F3</td><td>INC memory then SBC Accumulator from result. Also known as ISB/INS.</td><td>zp, zp,X, abs, abs,X, abs,Y, (ind,X), (ind),Y</td><td>N V Z C</td><td>5-8</td></tr>
+<tr><td>JMP</td><td>$4C $6C</td><td>Jump to address. Absolute ($4C) or Indirect ($6C, uses pointer). Note: JMP ($xxFF) has a page-wrap bug on NMOS 6502.</td><td>abs, (ind)</td><td>-</td><td>3-5</td></tr>
+<tr><td>JSR</td><td>$20</td><td>Jump to Subroutine. Pushes PC-1 (return-1) onto stack then jumps. RTS pops and adds 1.</td><td>abs</td><td>-</td><td>6</td></tr>
+<tr class="illegal"><td>LAS</td><td>$BB</td><td>Load A, X, and SP with (Memory AND SP). Rare, unstable on some revisions.</td><td>abs,Y</td><td>N Z</td><td>4-5</td></tr>
+<tr class="illegal"><td>LAX</td><td>$A7 $B7 $AF $BF $A3 $B3</td><td>Load both A and X from memory simultaneously. Useful shortcut for LAX $ZP → LDA $ZP / TAX in one byte.</td><td>zp, zp,Y, abs, abs,Y, (ind,X), (ind),Y</td><td>N Z</td><td>3-6</td></tr>
+<tr><td>LDA</td><td>$A9 $A5 $B5 $AD $BD $B9 $A1 $B1</td><td>Load Accumulator from Memory.</td><td>imm, zp, zp,X, abs, abs,X, abs,Y, (ind,X), (ind),Y</td><td>N Z</td><td>2-6</td></tr>
+<tr><td>LDX</td><td>$A2 $A6 $B6 $AE $BE</td><td>Load X Register from Memory.</td><td>imm, zp, zp,Y, abs, abs,Y</td><td>N Z</td><td>2-5</td></tr>
+<tr><td>LDY</td><td>$A0 $A4 $B4 $AC $BC</td><td>Load Y Register from Memory.</td><td>imm, zp, zp,X, abs, abs,X</td><td>N Z</td><td>2-5</td></tr>
+<tr><td>LSR</td><td>$4A $46 $56 $4E $5E</td><td>Logical Shift Right. Shifts all bits right one. Bit 7 = 0, old bit 0 → Carry. Halves unsigned value.</td><td>acc, zp, zp,X, abs, abs,X</td><td>N Z C</td><td>2-7</td></tr>
+<tr class="illegal"><td>LXA</td><td>$AB</td><td>(A OR $EE) AND #imm → A and X. Highly unstable. Behavior differs per chip revision and voltage.</td><td>imm</td><td>N Z</td><td>2</td></tr>
+<tr><td>NOP</td><td>$EA</td><td>No Operation. Wastes 2 cycles. Also has many illegal single-byte NOP variants ($1A,$3A,$5A,$7A,$DA,$FA).</td><td>impl</td><td>-</td><td>2</td></tr>
+<tr><td>ORA</td><td>$09 $05 $15 $0D $1D $19 $01 $11</td><td>Logical OR of Accumulator with Memory. Sets bits in A. A = A OR M.</td><td>imm, zp, zp,X, abs, abs,X, abs,Y, (ind,X), (ind),Y</td><td>N Z</td><td>2-6</td></tr>
+<tr><td>PHA</td><td>$48</td><td>Push Accumulator onto Stack. SP decrements after push. Stack at $01xx.</td><td>impl</td><td>-</td><td>3</td></tr>
+<tr><td>PHP</td><td>$08</td><td>Push Processor Status Register onto Stack. B flag always set in pushed value.</td><td>impl</td><td>-</td><td>3</td></tr>
+<tr><td>PLA</td><td>$68</td><td>Pull Accumulator from Stack. SP increments before pull.</td><td>impl</td><td>N Z</td><td>4</td></tr>
+<tr><td>PLP</td><td>$28</td><td>Pull Processor Status Register from Stack. Restores all flags. B flag ignored on pull.</td><td>impl</td><td>All</td><td>4</td></tr>
+<tr class="illegal"><td>RLA</td><td>$27 $37 $2F $3F $3B $23 $33</td><td>ROL memory then AND Accumulator with result. Replaces ROL + AND in one byte.</td><td>zp, zp,X, abs, abs,X, abs,Y, (ind,X), (ind),Y</td><td>N Z C</td><td>5-8</td></tr>
+<tr><td>ROL</td><td>$2A $26 $36 $2E $3E</td><td>Rotate Left through Carry. Old Carry → bit 0, old bit 7 → new Carry. Full 9-bit rotation with carry.</td><td>acc, zp, zp,X, abs, abs,X</td><td>N Z C</td><td>2-7</td></tr>
+<tr><td>ROR</td><td>$6A $66 $76 $6E $7E</td><td>Rotate Right through Carry. Old Carry → bit 7, old bit 0 → new Carry.</td><td>acc, zp, zp,X, abs, abs,X</td><td>N Z C</td><td>2-7</td></tr>
+<tr class="illegal"><td>RRA</td><td>$67 $77 $6F $7F $7B $63 $73</td><td>ROR memory then ADC Accumulator with result. Combines rotate and add.</td><td>zp, zp,X, abs, abs,X, abs,Y, (ind,X), (ind),Y</td><td>N V Z C</td><td>5-8</td></tr>
+<tr><td>RTI</td><td>$40</td><td>Return from Interrupt. Pulls P then PC from stack (opposite order from JSR/RTS).</td><td>impl</td><td>All</td><td>6</td></tr>
+<tr><td>RTS</td><td>$60</td><td>Return from Subroutine. Pulls PC from stack and adds 1. Pair with JSR.</td><td>impl</td><td>-</td><td>6</td></tr>
+<tr class="illegal"><td>SAX</td><td>$87 $97 $8F $83</td><td>Store (A AND X) into memory without affecting flags. Useful for storing a bitmasked value.</td><td>zp, zp,Y, abs, (ind,X)</td><td>-</td><td>3-6</td></tr>
+<tr><td>SBC</td><td>$E9 $E5 $F5 $ED $FD $F9 $E1 $F1</td><td>Subtract Memory from Accumulator with Borrow. A = A - M - (1-C). SEC before SBC to clear borrow.</td><td>imm, zp, zp,X, abs, abs,X, abs,Y, (ind,X), (ind),Y</td><td>N V Z C</td><td>2-6</td></tr>
+<tr class="illegal"><td>SBX</td><td>$CB</td><td>(A AND X) minus #imm → X. Sets N,Z,C like a compare. Also known as AXS/SAX imm.</td><td>imm</td><td>N Z C</td><td>2</td></tr>
+<tr><td>SEC</td><td>$38</td><td>Set Carry Flag. Required before SBC to set borrow = 0.</td><td>impl</td><td>C</td><td>2</td></tr>
+<tr><td>SED</td><td>$F8</td><td>Set Decimal Mode. BCD arithmetic mode (not used on C64 in practice — KERNAL clears it).</td><td>impl</td><td>D</td><td>2</td></tr>
+<tr><td>SEI</td><td>$78</td><td>Set Interrupt Disable. Blocks IRQ signals. Use when modifying interrupt vectors.</td><td>impl</td><td>I</td><td>2</td></tr>
+<tr class="illegal"><td>SHA</td><td>$9F $93</td><td>(A AND X AND (highbyte+1)) → memory. Unstable, value may be corrupted on page crossings.</td><td>abs,Y, (ind),Y</td><td>-</td><td>5-6</td></tr>
+<tr class="illegal"><td>SHX</td><td>$9E</td><td>(X AND (highbyte+1)) → memory. Result is unstable if page boundary crossed. Avoid.</td><td>abs,Y</td><td>-</td><td>5</td></tr>
+<tr class="illegal"><td>SHY</td><td>$9C</td><td>(Y AND (highbyte+1)) → memory. Similar instability to SHX.</td><td>abs,X</td><td>-</td><td>5</td></tr>
+<tr class="illegal"><td>SLO</td><td>$07 $17 $0F $1F $1B $03 $13</td><td>ASL memory then ORA Accumulator with result. Replaces ASL + ORA in one byte.</td><td>zp, zp,X, abs, abs,X, abs,Y, (ind,X), (ind),Y</td><td>N Z C</td><td>5-8</td></tr>
+<tr class="illegal"><td>SRE</td><td>$47 $57 $4F $5F $5B $43 $53</td><td>LSR memory then EOR Accumulator with result. Replaces LSR + EOR in one byte.</td><td>zp, zp,X, abs, abs,X, abs,Y, (ind,X), (ind),Y</td><td>N Z C</td><td>5-8</td></tr>
+<tr><td>STA</td><td>$85 $95 $8D $9D $99 $81 $91</td><td>Store Accumulator into Memory.</td><td>zp, zp,X, abs, abs,X, abs,Y, (ind,X), (ind),Y</td><td>-</td><td>3-6</td></tr>
+<tr><td>STX</td><td>$86 $96 $8E</td><td>Store X Register into Memory.</td><td>zp, zp,Y, abs</td><td>-</td><td>3-4</td></tr>
+<tr><td>STY</td><td>$84 $94 $8C</td><td>Store Y Register into Memory.</td><td>zp, zp,X, abs</td><td>-</td><td>3-4</td></tr>
+<tr class="illegal"><td>TAS</td><td>$9B</td><td>A AND X → SP, then (SP AND highbyte+1) → memory. Highly unstable, chip-dependent.</td><td>abs,Y</td><td>-</td><td>5</td></tr>
+<tr><td>TAX</td><td>$AA</td><td>Transfer Accumulator to X. X = A.</td><td>impl</td><td>N Z</td><td>2</td></tr>
+<tr><td>TAY</td><td>$A8</td><td>Transfer Accumulator to Y. Y = A.</td><td>impl</td><td>N Z</td><td>2</td></tr>
+<tr><td>TSX</td><td>$BA</td><td>Transfer Stack Pointer to X. X = SP. Lets you read current stack depth.</td><td>impl</td><td>N Z</td><td>2</td></tr>
+<tr><td>TXA</td><td>$8A</td><td>Transfer X to Accumulator. A = X.</td><td>impl</td><td>N Z</td><td>2</td></tr>
+<tr><td>TXS</td><td>$9A</td><td>Transfer X to Stack Pointer. SP = X. Does NOT set flags. Used to set up stack.</td><td>impl</td><td>-</td><td>2</td></tr>
+<tr><td>TYA</td><td>$98</td><td>Transfer Y to Accumulator. A = Y.</td><td>impl</td><td>N Z</td><td>2</td></tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <!-- ===== ADDRESSING MODES TAB ===== -->
+    <div id="Addressing" class="tab-content">
+        <h2>All 13 Addressing Modes</h2>
+        <div class="scrollbox">
+        <table>
+            <thead><tr><th>Mode</th><th>Syntax Example</th><th>Bytes</th><th>Effective Address / Value</th><th>Notes</th></tr></thead>
+            <tbody>
+<tr><td>Implied</td><td>CLC / RTS / INX</td><td>1</td><td>No operand. Operates on register(s) only.</td><td>Fastest — no memory fetch beyond opcode itself.</td></tr>
+<tr><td>Accumulator</td><td>ASL A / LSR A / ROL A</td><td>1</td><td>Operates directly on the A register.</td><td>Some assemblers omit the "A" — context-dependent.</td></tr>
+<tr><td>Immediate</td><td>LDA #$42 / AND #%11110000</td><td>2</td><td>Value is the literal byte following the opcode.</td><td>Fast (2 cycles). # prefix. Can use decimal, hex, or binary.</td></tr>
+<tr><td>Zero Page</td><td>LDA $C0 / STA $FB</td><td>2</td><td>Address is $00xx — high byte assumed $00.</td><td>3 cycles. ZP is fastest RAM access. Reserve $00-$FF for critical vars.</td></tr>
+<tr><td>Zero Page, X</td><td>LDA $C0,X / STA $80,X</td><td>2</td><td>Address = $00 + lowbyte + X (wraps within page 0)</td><td>4 cycles. Ideal for small indexed tables in ZP. X wraps: $FE+3 = $01.</td></tr>
+<tr><td>Zero Page, Y</td><td>LDX $20,Y / STX $30,Y</td><td>2</td><td>Address = $00 + lowbyte + Y (wraps within page 0)</td><td>Only LDX and STX use ZP,Y. 4 cycles.</td></tr>
+<tr><td>Absolute</td><td>LDA $D020 / STA $6000</td><td>3</td><td>Full 16-bit address in operand (lo-byte first).</td><td>4 cycles. Standard HW register access mode.</td></tr>
+<tr><td>Absolute, X</td><td>STA $D000,X / LDA $6000,X</td><td>3</td><td>Address = full 16-bit base + X</td><td>4-5 cycles (+1 if page crossed). Loop through tables/screen RAM.</td></tr>
+<tr><td>Absolute, Y</td><td>LDA $6000,Y / STA $C000,Y</td><td>3</td><td>Address = full 16-bit base + Y</td><td>4-5 cycles (+1 if page crossed). Like abs,X but with Y.</td></tr>
+<tr><td>Indirect</td><td>JMP ($0300)</td><td>3</td><td>Reads 16-bit pointer from given address, jumps there.</td><td>JMP only. NMOS bug: JMP ($xxFF) reads high byte from $xx00 not $xx+1,00.</td></tr>
+<tr><td>(Indirect, X)</td><td>LDA ($20,X) / STA ($40,X)</td><td>2</td><td>ZP address = lowbyte+X; read 16-bit pointer from there.</td><td>6 cycles. X selects which pointer in a ZP table. X usually 0 or small.</td></tr>
+<tr><td>(Indirect), Y</td><td>LDA ($20),Y / STA ($FB),Y</td><td>2</td><td>Read 16-bit pointer from ZP address; add Y for final address.</td><td>5-6 cycles. Most flexible. Pointer in ZP, Y is row/column offset.</td></tr>
+<tr><td>Relative</td><td>BNE loop / BCC done</td><td>2</td><td>Signed 8-bit offset from next instruction PC. Range: -128 to +127.</td><td>Branch ops only. 2 cycles not taken, 3 taken, 4 if page crossed.</td></tr>
+            </tbody>
+        </table>
+
+        <h2 style="margin-top:24px">Addressing Mode Decision Guide</h2>
+        <table>
+            <thead><tr><th>Goal</th><th>Best Mode</th><th>Why</th></tr></thead>
+            <tbody>
+<tr><td>Read a hardware register (VIC/SID/CIA)</td><td>Absolute</td><td>HW regs are all above $D000, need full 16-bit address</td></tr>
+<tr><td>Fast frequently-accessed variable</td><td>Zero Page</td><td>2-byte instruction, 3 cycles, page 0 only</td></tr>
+<tr><td>Loop through a 256-byte table</td><td>Absolute,X or ZP,X</td><td>Increment X each iteration, no pointer update needed</td></tr>
+<tr><td>Copy data via a pointer (variable dest)</td><td>(Indirect),Y</td><td>Store pointer in ZP, Y steps through bytes</td></tr>
+<tr><td>Select one of several sub-tables</td><td>(Indirect,X)</td><td>X picks the ZP pointer, pointer holds the table base</td></tr>
+<tr><td>Conditional loop / early exit</td><td>Relative (branch)</td><td>Only mode for branches; keep loops &lt;128 bytes or use JMP</td></tr>
+<tr><td>Sprite X positions ($D000,$D002,...)</td><td>Absolute,X (X=0,2,4...)</td><td>Step X by 2 to hit each sprite register pair</td></tr>
+<tr><td>Screen RAM fill (1000 bytes)</td><td>Absolute,X / Absolute,Y</td><td>X or Y as counter; need outer loop for >256 bytes</td></tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <!-- ===== MEMORY MAP TAB ===== -->
+    <div id="Memory" class="tab-content">
+        <h2>C64 Complete Hardware Memory Map</h2>
+        <p style="font-size:0.8em;color:var(--c64-text)">
+            <span class="chip-tag chip-vic">VIC-II</span>
+            <span class="chip-tag chip-sid">SID</span>
+            <span class="chip-tag chip-cia">CIA</span>
+            <span class="chip-tag chip-cpu">CPU/6510</span>
+            <span class="chip-tag chip-rom">ROM</span>
+            <span class="chip-tag chip-ram">RAM</span>
+            &nbsp;|&nbsp;
+            <span class="rw-r">R</span>=Read &nbsp;
+            <span class="rw-w">W</span>=Write &nbsp;
+            <span class="rw-rw">R/W</span>=Both
+        </p>
+        <input type="text" id="memSearch" onkeyup="searchTable('memSearch','memTable')" placeholder="Search address, chip, register name...">
+        <div class="scrollbox">
+        <table id="memTable">
+            <thead><tr><th style="width:140px">Address</th><th>Chip</th><th>R/W</th><th>Register / Area</th><th>Details</th></tr></thead>
+            <tbody>
+<!-- 6510 CPU PORT -->
+<tr><td>$0000</td><td><span class="chip-tag chip-cpu">CPU</span></td><td class="rw-rw">R/W</td><td>6510 Data Direction Register</td><td>Bits 0-5 control direction of port pins. Bit=0:Input, Bit=1:Output. Default: $2F ($00101111).</td></tr>
+<tr><td>$0001</td><td><span class="chip-tag chip-cpu">CPU</span></td><td class="rw-rw">R/W</td><td>6510 Processor I/O Port</td><td>Bits 0-2: ROM/RAM banking. Bit 3: Cassette motor. Bit 4: Cassette sense. Bit 5: Cassette data. Bits 6-7: unused. Default $37 = BASIC+KERNAL ROM visible.</td></tr>
+<!-- ZERO PAGE -->
+<tr><td>$0002-$00FF</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>Zero Page</td><td>Fastest addressable RAM. Pages 0 OS/KERNAL uses $02-$8F. Free for user: $02-$0F approx. Always check KERNAL usage before claiming ZP locations.</td></tr>
+<tr><td>$0002-$0003</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>Unused / User ZP</td><td>Genuinely free on stock C64.</td></tr>
+<tr><td>$0090-$00FF</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>KERNAL / BASIC ZP variables</td><td>KERNAL indirect vectors, BASIC pointers. Avoid unless BASIC/KERNAL ROM is switched out.</td></tr>
+<!-- STACK -->
+<tr><td>$0100-$01FF</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>CPU Stack (Page 1)</td><td>Hardware stack. SP starts at $FF, grows downward. Push decrements SP; pull increments. Max 128 nested JSR calls (each uses 2 bytes) + IRQ overhead.</td></tr>
+<!-- OS VECTORS -->
+<tr><td>$0300</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>Error Message Vector (lo)</td><td>Pointer to error message routine (default → KERNAL).</td></tr>
+<tr><td>$0301</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>Error Message Vector (hi)</td><td></td></tr>
+<tr><td>$0314</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>IRQ Vector (lo)</td><td>Points to IRQ handler. Default → KERNAL $EA31. Overwrite to hook custom IRQ. Must use SEI before changing.</td></tr>
+<tr><td>$0315</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>IRQ Vector (hi)</td><td></td></tr>
+<tr><td>$0316</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>BRK Vector (lo)</td><td>Called on BRK instruction. Default → KERNAL monitor.</td></tr>
+<tr><td>$0317</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>BRK Vector (hi)</td><td></td></tr>
+<tr><td>$0318</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>NMI Vector (lo)</td><td>NMI (RESTORE key). Default → KERNAL NMI handler.</td></tr>
+<tr><td>$0319</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>NMI Vector (hi)</td><td></td></tr>
+<tr><td>$033C-$03FB</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>Cassette / RS-232 Buffers</td><td>KERNAL tape buffer. Safe for short machine code when cassette unused.</td></tr>
+<!-- DEFAULT SCREEN -->
+<tr><td>$0400-$07E7</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Default Screen RAM (1000 chars)</td><td>40×25 text screen. Each byte = character index. Color set separately in Color RAM $D800. Can be relocated via $D018.</td></tr>
+<tr><td>$07F8-$07FF</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Default Sprite Pointers</td><td>8 bytes. Each byte × 64 = sprite data address within current VIC bank. Default bank is $0000-$3FFF, so byte $0E → $0380.</td></tr>
+<!-- BASIC RAM -->
+<tr><td>$0800-$9FFF</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>BASIC Program RAM</td><td>38KB. BASIC programs start at $0801. Machine code can live here when BASIC ROM switched out.</td></tr>
+<tr><td>$A000-$BFFF</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>BASIC ROM (8KB)</td><td>BASIC interpreter. Can be replaced with 8KB RAM by setting $0001 bit 0 = 0. Char ROM also accessible at $D000 when I/O disabled.</td></tr>
+<!-- FREE RAM -->
+<tr><td>$C000-$CFFF</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>Free RAM (4KB)</td><td>Always RAM regardless of banking. Classic location for assembly code and data. No ROM shadows here.</td></tr>
+<!-- VIC-II -->
+<tr><td>$D000</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 0 X-Position</td><td>Bits 0-7 of sprite 0 horizontal position. Bit 8 in $D010. Full range 0-343 pixels.</td></tr>
+<tr><td>$D001</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 0 Y-Position</td><td>Vertical position 0-255. Visible range approx 50-250. Top of display ≈ line 50.</td></tr>
+<tr><td>$D002</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 1 X-Position</td><td></td></tr>
+<tr><td>$D003</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 1 Y-Position</td><td></td></tr>
+<tr><td>$D004</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 2 X-Position</td><td></td></tr>
+<tr><td>$D005</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 2 Y-Position</td><td></td></tr>
+<tr><td>$D006</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 3 X-Position</td><td></td></tr>
+<tr><td>$D007</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 3 Y-Position</td><td></td></tr>
+<tr><td>$D008</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 4 X-Position</td><td></td></tr>
+<tr><td>$D009</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 4 Y-Position</td><td></td></tr>
+<tr><td>$D00A</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 5 X-Position</td><td></td></tr>
+<tr><td>$D00B</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 5 Y-Position</td><td></td></tr>
+<tr><td>$D00C</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 6 X-Position</td><td></td></tr>
+<tr><td>$D00D</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 6 Y-Position</td><td></td></tr>
+<tr><td>$D00E</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 7 X-Position</td><td></td></tr>
+<tr><td>$D00F</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 7 Y-Position</td><td></td></tr>
+<tr><td>$D010</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite MSB X-Positions</td><td>Bit N = bit 8 of sprite N's X coordinate. Set to move sprite past X=255.</td></tr>
+<tr><td>$D011</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>VIC Control Register 1</td><td>Bit 7: Raster bit 8 (write trigger line 256-311). Bit 6: Extended color mode. Bit 5: Bitmap mode. Bit 4: Screen enable. Bit 3: 25-row select (0=24 rows). Bits 0-2: Y-scroll (0-7).</td></tr>
+<tr><td>$D012</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Raster Counter</td><td>READ: current raster line (0-311 PAL). WRITE: lower 8 bits of raster compare for IRQ. Use with $D011 bit 7 for lines 256-311.</td></tr>
+<tr><td>$D013</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-r">R</td><td>Light Pen X Latch</td><td>X position where light pen triggered. Latched on rising edge of LP pin.</td></tr>
+<tr><td>$D014</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-r">R</td><td>Light Pen Y Latch</td><td>Y (raster line) where light pen triggered.</td></tr>
+<tr><td>$D015</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite Enable Register</td><td>Bit N = enable sprite N. 1=visible. $FF enables all 8 sprites.</td></tr>
+<tr><td>$D016</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>VIC Control Register 2</td><td>Bit 4: Multicolor mode (text). Bit 3: 40-column select (0=38 cols). Bits 0-2: X-scroll (0-7). Used for smooth horizontal scrolling.</td></tr>
+<tr><td>$D017</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite Y-Expand Register</td><td>Bit N = double height for sprite N. 1=2× vertical size.</td></tr>
+<tr><td>$D018</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>VIC Memory Control</td><td>Bits 4-7: Screen RAM offset within VIC bank (×1024). Bits 1-3: Charset/bitmap pointer (×2048 for charset, ×8192 for bitmap). Default $15 = screen at bank+$0400, charset at bank+$1000.</td></tr>
+<tr><td>$D019</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>VIC Interrupt Status</td><td>READ: Bit 7=any IRQ, Bit 3=light pen, Bit 2=sprite-bg coll, Bit 1=sprite-sprite coll, Bit 0=raster match. WRITE: Write 1 to bit to acknowledge (clear) it.</td></tr>
+<tr><td>$D01A</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>VIC Interrupt Enable</td><td>Bit 3=light pen IRQ enable, Bit 2=sprite-bg coll enable, Bit 1=sprite-sprite coll enable, Bit 0=raster IRQ enable. Must set alongside $D019 handler.</td></tr>
+<tr><td>$D01B</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite-Background Priority</td><td>Bit N = sprite N priority. 0=sprite in front of background, 1=background in front of sprite.</td></tr>
+<tr><td>$D01C</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite Multicolor Enable</td><td>Bit N = sprite N uses multicolor mode. 4 colors: 00=transparent, 01=$D025, 10=sprite color, 11=$D026.</td></tr>
+<tr><td>$D01D</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite X-Expand Register</td><td>Bit N = double width for sprite N.</td></tr>
+<tr><td>$D01E</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-r">R</td><td>Sprite-Sprite Collision</td><td>Bit N set if sprite N has collided with another sprite. Cleared on read.</td></tr>
+<tr><td>$D01F</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-r">R</td><td>Sprite-Background Collision</td><td>Bit N set if sprite N overlaps a non-zero background pixel. Cleared on read.</td></tr>
+<tr><td>$D020</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Border Color</td><td>Bits 0-3: border color (0-15). Upper nibble ignored. Classic demo trick: change mid-raster to show color bars.</td></tr>
+<tr><td>$D021</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Background Color 0</td><td>Main background color in text mode.</td></tr>
+<tr><td>$D022</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Background Color 1</td><td>Used in multi-color text mode for "01" pixel pattern.</td></tr>
+<tr><td>$D023</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Background Color 2</td><td>Used in multi-color text mode for "10" pixel pattern.</td></tr>
+<tr><td>$D024</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Background Color 3</td><td>Extra color for extended background color mode (bits 6-7 of char index select bg color).</td></tr>
+<tr><td>$D025</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite Multicolor 0</td><td>Shared color for "01" bits in all multicolor sprites.</td></tr>
+<tr><td>$D026</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite Multicolor 1</td><td>Shared color for "11" bits in all multicolor sprites.</td></tr>
+<tr><td>$D027</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 0 Color</td><td>Individual color for sprite 0 (hi-res "1" pixels or multicolor "10" pixels).</td></tr>
+<tr><td>$D028</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 1 Color</td><td></td></tr>
+<tr><td>$D029</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 2 Color</td><td></td></tr>
+<tr><td>$D02A</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 3 Color</td><td></td></tr>
+<tr><td>$D02B</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 4 Color</td><td></td></tr>
+<tr><td>$D02C</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 5 Color</td><td></td></tr>
+<tr><td>$D02D</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 6 Color</td><td></td></tr>
+<tr><td>$D02E</td><td><span class="chip-tag chip-vic">VIC-II</span></td><td class="rw-rw">R/W</td><td>Sprite 7 Color</td><td></td></tr>
+<!-- SID -->
+<tr><td>$D400</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 1: Frequency Lo</td><td>Low byte of 16-bit frequency value. Freq = (FN × clock) / 16777216. PAL clock ≈ 985248 Hz.</td></tr>
+<tr><td>$D401</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 1: Frequency Hi</td><td>High byte of frequency. Combined $D400/$D401 = 16-bit freq word.</td></tr>
+<tr><td>$D402</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 1: Pulse Width Lo</td><td>Low byte of 12-bit pulse width (0-4095). Only bits 0-7 used.</td></tr>
+<tr><td>$D403</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 1: Pulse Width Hi</td><td>High nibble = bits 8-11 of pulse width. 50% duty = $0800. Wider pulse = thicker sound.</td></tr>
+<tr><td>$D404</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 1: Control Register</td><td>Bit 7=Noise, Bit 6=Pulse, Bit 5=Sawtooth, Bit 4=Triangle. Bit 3=Test(zero acc). Bit 2=Ring mod. Bit 1=Sync. Bit 0=Gate (1=ADSR start, 0=release phase).</td></tr>
+<tr><td>$D405</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 1: Attack / Decay</td><td>Bits 4-7: Attack (0=2ms, 15=8s). Bits 0-3: Decay (0=6ms, 15=24s). Non-linear scale.</td></tr>
+<tr><td>$D406</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 1: Sustain / Release</td><td>Bits 4-7: Sustain level (0-15, linear). Bits 0-3: Release (0=6ms, 15=24s).</td></tr>
+<tr><td>$D407</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 2: Frequency Lo</td><td></td></tr>
+<tr><td>$D408</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 2: Frequency Hi</td><td></td></tr>
+<tr><td>$D409</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 2: Pulse Width Lo</td><td></td></tr>
+<tr><td>$D40A</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 2: Pulse Width Hi</td><td></td></tr>
+<tr><td>$D40B</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 2: Control Register</td><td>Same bits as $D404 but for voice 2.</td></tr>
+<tr><td>$D40C</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 2: Attack / Decay</td><td></td></tr>
+<tr><td>$D40D</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 2: Sustain / Release</td><td></td></tr>
+<tr><td>$D40E</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 3: Frequency Lo</td><td></td></tr>
+<tr><td>$D40F</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 3: Frequency Hi</td><td></td></tr>
+<tr><td>$D410</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 3: Pulse Width Lo</td><td></td></tr>
+<tr><td>$D411</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 3: Pulse Width Hi</td><td></td></tr>
+<tr><td>$D412</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 3: Control Register</td><td>Same bits as $D404. Voice 3 can be used for noise channel or muted ($D418 bit 7).</td></tr>
+<tr><td>$D413</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 3: Attack / Decay</td><td></td></tr>
+<tr><td>$D414</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Voice 3: Sustain / Release</td><td></td></tr>
+<tr><td>$D415</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Filter Cutoff Lo</td><td>Bits 0-2: low 3 bits of 11-bit filter cutoff frequency. 0=lowest cutoff.</td></tr>
+<tr><td>$D416</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Filter Cutoff Hi</td><td>High 8 bits of cutoff. Combined $D415/$D416 = 11-bit frequency (0-2047).</td></tr>
+<tr><td>$D417</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Filter Resonance / Route</td><td>Bits 4-7: Resonance (0-15). Bit 3: Filter voice 3. Bit 2: Filter voice 2. Bit 1: Filter voice 1. Bit 0: Filter ext input.</td></tr>
+<tr><td>$D418</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-w">W</td><td>Volume / Filter Mode</td><td>Bits 0-3: Master volume (0-15). Bit 4: Low-pass filter. Bit 5: Band-pass filter. Bit 6: High-pass filter. Bit 7: Disconnect voice 3 from output (voice 3 still oscillates for modulation).</td></tr>
+<tr><td>$D419</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-r">R</td><td>Analog/Digital Converter: Paddle 1</td><td>Reads potentiometer value from joystick port 1, pin 9. 0-255.</td></tr>
+<tr><td>$D41A</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-r">R</td><td>Analog/Digital Converter: Paddle 2</td><td>Reads potentiometer from joystick port 1, pin 5.</td></tr>
+<tr><td>$D41B</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-r">R</td><td>Voice 3 Oscillator Output</td><td>Read current value of voice 3 waveform generator. Useful for pseudo-random numbers (noise waveform).</td></tr>
+<tr><td>$D41C</td><td><span class="chip-tag chip-sid">SID</span></td><td class="rw-r">R</td><td>Voice 3 Envelope Output</td><td>Current ADSR envelope value for voice 3. Read to sync other voices to voice 3's envelope shape.</td></tr>
+<!-- COLOR RAM -->
+<tr><td>$D800-$DBE7</td><td><span class="chip-tag chip-ram">RAM</span></td><td class="rw-rw">R/W</td><td>Color RAM (1000 nibbles)</td><td>One byte per screen character. Only lower 4 bits matter (color 0-15). Persists on power cycle (static RAM). Upper nibble reads as $F on most boards.</td></tr>
+<!-- CIA 1 -->
+<tr><td>$DC00</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Port A: Keyboard / Joystick 2</td><td>WRITE: Select keyboard row/column by pulling low. READ: Joystick 2 — Bit 0=Up, 1=Down, 2=Left, 3=Right, 4=Fire. 0=pressed.</td></tr>
+<tr><td>$DC01</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Port B: Keyboard / Joystick 1</td><td>READ keyboard column after writing row to $DC00. Joystick 1 same bit layout as $DC00.</td></tr>
+<tr><td>$DC02</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Port A Data Direction</td><td>Bit=1:Output, 0:Input. Default $FF (all output) for keyboard scanning.</td></tr>
+<tr><td>$DC03</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Port B Data Direction</td><td>Default $00 (all input) for keyboard reading.</td></tr>
+<tr><td>$DC04</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Timer A Lo</td><td>Low byte of Timer A latch/counter. READ returns current count, WRITE sets latch (loaded on underflow or Force Load).</td></tr>
+<tr><td>$DC05</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Timer A Hi</td><td>High byte of Timer A. Default value gives 60Hz system IRQ tick. For custom rate: latch = (clock / desired_freq) - 1.</td></tr>
+<tr><td>$DC06</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Timer B Lo</td><td>Low byte of Timer B.</td></tr>
+<tr><td>$DC07</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Timer B Hi</td><td>Timer B can count CPU cycles or Timer A underflows.</td></tr>
+<tr><td>$DC08</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Time of Day: Tenths</td><td>READ: current 1/10s (0-9 BCD). WRITE: alarm 1/10s (when $DC0B written). TOD starts after write to $DC0B.</td></tr>
+<tr><td>$DC09</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Time of Day: Seconds</td><td>BCD 00-59.</td></tr>
+<tr><td>$DC0A</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Time of Day: Minutes</td><td>BCD 00-59.</td></tr>
+<tr><td>$DC0B</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Time of Day: Hours</td><td>BCD 01-12. Bit 7=PM flag. Writing this register starts the clock.</td></tr>
+<tr><td>$DC0C</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Serial Shift Register</td><td>8-bit serial I/O. Can receive/transmit. Connected to serial bus CNT line.</td></tr>
+<tr><td>$DC0D</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Interrupt Control</td><td>READ: status (which interrupt fired). WRITE: mask (bit 7=1 to set, 0 to clear). Bit 0=Timer A, 1=Timer B, 2=TOD alarm, 3=Serial, 4=FLAG. Write $7F to disable all CIA1 IRQs.</td></tr>
+<tr><td>$DC0E</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Control Register A</td><td>Bit 0=Start timer A. Bit 3=1:one-shot, 0:continuous. Bit 4=Force Load latch into counter. Bit 5=Count mode. Bit 6=Serial direction. Bit 7=TOD speed (0=60Hz, 1=50Hz — set to 1 on PAL).</td></tr>
+<tr><td>$DC0F</td><td><span class="chip-tag chip-cia">CIA 1</span></td><td class="rw-rw">R/W</td><td>CIA1 Control Register B</td><td>Bit 0=Start timer B. Bits 5-6=Timer B count mode (00=CPU cycles, 01=CNT pin, 10=Timer A underflows, 11=Timer A + CNT).</td></tr>
+<!-- CIA 2 -->
+<tr><td>$DD00</td><td><span class="chip-tag chip-cia">CIA 2</span></td><td class="rw-rw">R/W</td><td>CIA2 Port A: VIC Bank / Serial</td><td>Bits 0-1: VIC-II bank select (inverted). 00=%11→Bank 3 ($C000), 01=%10→Bank 2 ($8000), 10=%01→Bank 1 ($4000), 11=%00→Bank 0 ($0000 default). Also serial bus ATN/CLK/DATA.</td></tr>
+<tr><td>$DD01</td><td><span class="chip-tag chip-cia">CIA 2</span></td><td class="rw-rw">R/W</td><td>CIA2 Port B: User Port / RS-232</td><td>User port lines PB0-PB7. RS-232 signals when using KERNAL RS-232 routines.</td></tr>
+<tr><td>$DD02</td><td><span class="chip-tag chip-cia">CIA 2</span></td><td class="rw-rw">R/W</td><td>CIA2 Port A Data Direction</td><td>Default $3F. Bits 0-1 output (VIC bank), bit 3 output (ATN).</td></tr>
+<tr><td>$DD03</td><td><span class="chip-tag chip-cia">CIA 2</span></td><td class="rw-rw">R/W</td><td>CIA2 Port B Data Direction</td><td>Default $00 (user port all input).</td></tr>
+<tr><td>$DD04</td><td><span class="chip-tag chip-cia">CIA 2</span></td><td class="rw-rw">R/W</td><td>CIA2 Timer A Lo</td><td>Available for user timing. Not connected to IRQ by default.</td></tr>
+<tr><td>$DD05</td><td><span class="chip-tag chip-cia">CIA 2</span></td><td class="rw-rw">R/W</td><td>CIA2 Timer A Hi</td><td></td></tr>
+<tr><td>$DD06</td><td><span class="chip-tag chip-cia">CIA 2</span></td><td class="rw-rw">R/W</td><td>CIA2 Timer B Lo</td><td></td></tr>
+<tr><td>$DD07</td><td><span class="chip-tag chip-cia">CIA 2</span></td><td class="rw-rw">R/W</td><td>CIA2 Timer B Hi</td><td></td></tr>
+<tr><td>$DD0D</td><td><span class="chip-tag chip-cia">CIA 2</span></td><td class="rw-rw">R/W</td><td>CIA2 Interrupt Control</td><td>CIA2 fires NMI (not IRQ). Bit 0=Timer A NMI, etc. Write $7F to clear all. NMI also triggered by RESTORE key via CIA2 FLAG pin.</td></tr>
+<tr><td>$DD0E</td><td><span class="chip-tag chip-cia">CIA 2</span></td><td class="rw-rw">R/W</td><td>CIA2 Control Register A</td><td>Same format as $DC0E.</td></tr>
+<tr><td>$DD0F</td><td><span class="chip-tag chip-cia">CIA 2</span></td><td class="rw-rw">R/W</td><td>CIA2 Control Register B</td><td></td></tr>
+<!-- KERNAL ROM -->
+<tr><td>$E000-$FFFF</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL ROM (8KB)</td><td>OS routines. Can be replaced with RAM ($0001 bit 1=0). Contains HW vectors at $FFFA-$FFFF.</td></tr>
+<tr><td>$FF81</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: SCINIT</td><td>Initialize screen editor and VIC.</td></tr>
+<tr><td>$FF84</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: IOINIT</td><td>Initialize I/O devices (CIA, SID, VIC).</td></tr>
+<tr><td>$FF87</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: RAMTAS</td><td>Initialize and test RAM. Sets start-of-BASIC pointer.</td></tr>
+<tr><td>$FF8A</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: RESTOR</td><td>Restore default I/O vectors to KERNAL.</td></tr>
+<tr><td>$FF8D</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: VECTOR</td><td>Copy I/O vectors to/from user table.</td></tr>
+<tr><td>$FF90</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: SETMSG</td><td>Control KERNAL messages (error/status display on/off).</td></tr>
+<tr><td>$FF93</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: SECOND</td><td>Send secondary address after LISTEN.</td></tr>
+<tr><td>$FF96</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: TKSA</td><td>Send secondary address after TALK.</td></tr>
+<tr><td>$FF99</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: MEMTOP</td><td>Read/set top of RAM pointer.</td></tr>
+<tr><td>$FF9C</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: MEMBOT</td><td>Read/set bottom of RAM pointer.</td></tr>
+<tr><td>$FF9F</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: SCNKEY</td><td>Scan keyboard and update keyboard buffer.</td></tr>
+<tr><td>$FFA2</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: SETTMO</td><td>Set serial bus timeout flag.</td></tr>
+<tr><td>$FFA5</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: ACPTR</td><td>Receive byte from serial bus. Returns byte in A.</td></tr>
+<tr><td>$FFA8</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: CIOUT</td><td>Send byte via serial bus (byte in A).</td></tr>
+<tr><td>$FFAB</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: UNTLK</td><td>Send UNTALK command to serial bus.</td></tr>
+<tr><td>$FFAE</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: UNLSN</td><td>Send UNLISTEN to serial bus.</td></tr>
+<tr><td>$FFB1</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: LISTEN</td><td>Send device address + LISTEN command. Device # in A.</td></tr>
+<tr><td>$FFB4</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: TALK</td><td>Send device address + TALK. Device # in A.</td></tr>
+<tr><td>$FFB7</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: READST</td><td>Read I/O status byte into A. Bit 2=short, 3=long, 6=EOI, 7=timeout.</td></tr>
+<tr><td>$FFBA</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: SETLFS</td><td>Set logical file, device, secondary address. A=logical, X=device, Y=secondary.</td></tr>
+<tr><td>$FFBD</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: SETNAM</td><td>Set filename. A=length, X=lo, Y=hi of string address.</td></tr>
+<tr><td>$FFC0</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: OPEN</td><td>Open logical file (uses SETLFS/SETNAM params).</td></tr>
+<tr><td>$FFC3</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: CLOSE</td><td>Close logical file (A = logical file number).</td></tr>
+<tr><td>$FFC6</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: CHKIN</td><td>Open channel for input. X = logical file number.</td></tr>
+<tr><td>$FFC9</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: CHKOUT</td><td>Open channel for output. X = logical file number.</td></tr>
+<tr><td>$FFCC</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: CLRCHN</td><td>Restore default I/O channels (keyboard in, screen out).</td></tr>
+<tr><td>$FFCF</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: CHRIN</td><td>Read byte from current input channel. Returns char in A.</td></tr>
+<tr><td>$FFD2</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: CHROUT</td><td>Write byte to current output channel. A = PETSCII char. Handles screen, printer, disk depending on CHKOUT setting.</td></tr>
+<tr><td>$FFD5</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: LOAD</td><td>Load file from device. A=0:load, A=1:verify. X/Y=load address (if secondary=0).</td></tr>
+<tr><td>$FFD8</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: SAVE</td><td>Save memory range to device. A=lo pointer ZP addr, X=end lo, Y=end hi.</td></tr>
+<tr><td>$FFDB</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: SETTIM</td><td>Set software jiffy clock. A=hi, X=mid, Y=lo (in 1/60s ticks).</td></tr>
+<tr><td>$FFDE</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: RDTIM</td><td>Read software jiffy clock into A (hi), X (mid), Y (lo).</td></tr>
+<tr><td>$FFE1</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: STOP</td><td>Check for STOP key. Z set if STOP pressed, returns key matrix byte in A.</td></tr>
+<tr><td>$FFE4</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: GETIN</td><td>Get char from keyboard buffer. Returns 0 in A if buffer empty. Non-blocking.</td></tr>
+<tr><td>$FFE7</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: CLALL</td><td>Close all files and reset I/O channels.</td></tr>
+<tr><td>$FFEA</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: UDTIM</td><td>Increment software clock by 1 jiffy. Called by default IRQ handler.</td></tr>
+<tr><td>$FFED</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: SCREEN</td><td>Returns screen dimensions in X (cols) and Y (rows).</td></tr>
+<tr><td>$FFF0</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: PLOT</td><td>Read/set cursor position. C=1:read (returns X col, Y row). C=0:set (X=col, Y=row).</td></tr>
+<tr><td>$FFF3</td><td><span class="chip-tag chip-rom">ROM</span></td><td class="rw-r">R</td><td>KERNAL: IOBASE</td><td>Returns base address of CIA chips in X (lo) and Y (hi). $DC00.</td></tr>
+<!-- HW VECTORS -->
+<tr><td>$FFFA-$FFFB</td><td><span class="chip-tag chip-cpu">CPU</span></td><td class="rw-r">R</td><td>NMI Hardware Vector</td><td>CPU fetches NMI handler address from here on NMI signal. Points into KERNAL ROM by default ($FE43).</td></tr>
+<tr><td>$FFFC-$FFFD</td><td><span class="chip-tag chip-cpu">CPU</span></td><td class="rw-r">R</td><td>RESET Hardware Vector</td><td>CPU reads start address from here on power-on/reset. Points to KERNAL cold start ($FCE2).</td></tr>
+<tr><td>$FFFE-$FFFF</td><td><span class="chip-tag chip-cpu">CPU</span></td><td class="rw-r">R</td><td>IRQ/BRK Hardware Vector</td><td>CPU reads IRQ handler from here on IRQ or BRK. Default → $FF48 (KERNAL IRQ dispatcher which then calls $0314/$0315).</td></tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <!-- ===== REGISTERS TAB ===== -->
+    <div id="Registers" class="tab-content">
+        <h2>6502 / 6510 Architecture</h2>
+        <div class="reg-grid">
+            <div class="reg-card">
+                <div class="reg-name">A — Accumulator</div>
+                <div class="reg-bits">████████ (8-bit)</div>
+                <p class="flag-desc">Primary arithmetic and logic register. All ALU operations use A. Only register that can do ADC/SBC. Load with LDA, store with STA, transfer to X/Y with TAX/TAY.</p>
+            </div>
+            <div class="reg-card">
+                <div class="reg-name">X — Index Register</div>
+                <div class="reg-bits">████████ (8-bit)</div>
+                <p class="flag-desc">Index register for abs,X and zp,X addressing. Loop counter. Only X can set the Stack Pointer via TXS. Compare with CPX. Transfer A↔X via TAX/TXA.</p>
+            </div>
+            <div class="reg-card">
+                <div class="reg-name">Y — Index Register</div>
+                <div class="reg-bits">████████ (8-bit)</div>
+                <p class="flag-desc">Index register for abs,Y and (ind),Y addressing. The latter is the most powerful 6502 indirect mode. Compare with CPY. Transfer A↔Y via TAY/TYA.</p>
+            </div>
+            <div class="reg-card">
+                <div class="reg-name">PC — Program Counter</div>
+                <div class="reg-bits">████████████████ (16-bit)</div>
+                <p class="flag-desc">Points to next instruction byte. Modified by JMP, JSR, RTS, RTI, BRK, and all branch instructions. Cannot be directly read or written — only indirectly via stack.</p>
+            </div>
+            <div class="reg-card">
+                <div class="reg-name">SP — Stack Pointer</div>
+                <div class="reg-bits">████████ (8-bit, page 1)</div>
+                <p class="flag-desc">Always points within $0100-$01FF. Decrements on push, increments on pull. Initialized by LDX #$FF / TXS at startup. Read via TSX. PHA/PHP push; PLA/PLP pull.</p>
+            </div>
+            <div class="reg-card">
+                <div class="reg-name">P — Processor Status</div>
+                <div class="reg-bits">N V - B D I Z C</div>
+                <div class="flag-row">
+                    <div class="flag-box set">N</div>
+                    <div class="flag-box set">V</div>
+                    <div class="flag-box">-</div>
+                    <div class="flag-box">B</div>
+                    <div class="flag-box">D</div>
+                    <div class="flag-box">I</div>
+                    <div class="flag-box set">Z</div>
+                    <div class="flag-box">C</div>
+                </div>
+                <p class="flag-desc"><strong style="color:#fff">N</strong> Negative — Set when bit 7 of result = 1.<br>
+                <strong style="color:#fff">V</strong> Overflow — Set when signed arithmetic overflows.<br>
+                <strong style="color:#fff">-</strong> Unused — Always reads 1.<br>
+                <strong style="color:#fff">B</strong> Break — Set in copy pushed to stack by BRK/PHP, not by IRQ.<br>
+                <strong style="color:#fff">D</strong> Decimal — BCD mode. Unused on C64 (always CLD at startup).<br>
+                <strong style="color:#fff">I</strong> IRQ Disable — SEI sets, CLI clears. Blocks maskable IRQs.<br>
+                <strong style="color:#fff">Z</strong> Zero — Set when result = $00.<br>
+                <strong style="color:#fff">C</strong> Carry — Unsigned overflow. Set by ADC overflow, CMP result, shifts.
+                </p>
+            </div>
+        </div>
+
+        <h2 style="margin-top:24px">C64 Color Values</h2>
+        <table style="max-width:600px">
+            <thead><tr><th>Value</th><th>Color</th><th>Value</th><th>Color</th></tr></thead>
+            <tbody>
+<tr><td>$00 / 0</td><td>Black</td><td>$08 / 8</td><td>Orange</td></tr>
+<tr><td>$01 / 1</td><td>White</td><td>$09 / 9</td><td>Brown</td></tr>
+<tr><td>$02 / 2</td><td>Red</td><td>$0A / 10</td><td>Light Red</td></tr>
+<tr><td>$03 / 3</td><td>Cyan</td><td>$0B / 11</td><td>Dark Grey</td></tr>
+<tr><td>$04 / 4</td><td>Purple</td><td>$0C / 12</td><td>Medium Grey</td></tr>
+<tr><td>$05 / 5</td><td>Green</td><td>$0D / 13</td><td>Light Green</td></tr>
+<tr><td>$06 / 6</td><td>Blue</td><td>$0E / 14</td><td>Light Blue</td></tr>
+<tr><td>$07 / 7</td><td>Yellow</td><td>$0F / 15</td><td>Light Grey</td></tr>
+            </tbody>
+        </table>
+
+        <h2 style="margin-top:24px">Banking Modes ($0001)</h2>
+        <table style="max-width:700px">
+            <thead><tr><th>$0001 value</th><th>$A000-$BFFF</th><th>$D000-$DFFF</th><th>$E000-$FFFF</th><th>Typical Use</th></tr></thead>
+            <tbody>
+<tr><td>$37 (default)</td><td>BASIC ROM</td><td>I/O (VIC/SID/CIA)</td><td>KERNAL ROM</td><td>Normal BASIC operation</td></tr>
+<tr><td>$36</td><td>BASIC ROM</td><td>Character ROM</td><td>KERNAL ROM</td><td>Read charset data</td></tr>
+<tr><td>$35</td><td>RAM</td><td>I/O</td><td>KERNAL ROM</td><td>ML + HW access + KERNAL</td></tr>
+<tr><td>$34</td><td>RAM</td><td>Character ROM</td><td>KERNAL ROM</td><td>Charset access + KERNAL</td></tr>
+<tr><td>$33</td><td>RAM</td><td>I/O</td><td>RAM</td><td>Full ML, custom IRQ vectors</td></tr>
+<tr><td>$30</td><td>RAM</td><td>RAM</td><td>RAM</td><td>All RAM — no I/O or ROM visible</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ===== EXAMPLES TAB ===== -->
+    <div id="Examples" class="tab-content">
+        <h2>Assembly Code Examples</h2>
+        <div class="ex-filter">
+            <span>Filter:</span>
+            <button onclick="filterEx('all')" id="f-all" class="active">All (30)</button>
+            <button onclick="filterEx('simple')" id="f-simple">Simple (10)</button>
+            <button onclick="filterEx('intermediate')" id="f-intermediate">Intermediate (10)</button>
+            <button onclick="filterEx('advanced')" id="f-advanced">Advanced (10)</button>
+        </div>
+        <div class="scrollbox" id="exContainer">
+
+        <!-- ====== SIMPLE ====== -->
+        <h3 style="color:var(--c64-green)">▼ SIMPLE</h3>
+        <div class="ex-grid">
+
+        <div class="ex-card difficulty-simple" data-diff="simple">
+            <span class="diff-badge badge-simple">SIMPLE</span>
+            <h3>1. Change Border Color</h3>
+            <div class="code-block"><span class="label">start:</span>
+  LDA #$02        <span class="comment">; color 2 = Red</span>
+  STA $D020       <span class="comment">; write to border color reg</span>
+  LDA #$05        <span class="comment">; color 5 = Green</span>
+  STA $D021       <span class="comment">; background color 0</span>
+  RTS</div>
+        </div>
+
+        <div class="ex-card difficulty-simple" data-diff="simple">
+            <span class="diff-badge badge-simple">SIMPLE</span>
+            <h3>2. Clear Screen (KERNAL)</h3>
+            <div class="code-block">  JSR $E544       <span class="comment">; KERNAL clear screen</span>
+  <span class="comment">; or manually with chrout</span>
+  LDA #$93        <span class="comment">; PETSCII CLR code</span>
+  JSR $FFD2       <span class="comment">; CHROUT</span>
+  RTS</div>
+        </div>
+
+        <div class="ex-card difficulty-simple" data-diff="simple">
+            <span class="diff-badge badge-simple">SIMPLE</span>
+            <h3>3. Print a Character</h3>
+            <div class="code-block">  LDA #$48        <span class="comment">; PETSCII 'H'</span>
+  JSR $FFD2       <span class="comment">; KERNAL CHROUT</span>
+  LDA #$49        <span class="comment">; 'I'</span>
+  JSR $FFD2
+  LDA #$0D        <span class="comment">; RETURN (newline)</span>
+  JSR $FFD2
+  RTS</div>
+        </div>
+
+        <div class="ex-card difficulty-simple" data-diff="simple">
+            <span class="diff-badge badge-simple">SIMPLE</span>
+            <h3>4. Simple Countdown Loop</h3>
+            <div class="code-block">  LDX #$64        <span class="comment">; X = 100</span>
+<span class="label">loop:</span>
+  DEX             <span class="comment">; X = X - 1</span>
+  BNE loop        <span class="comment">; loop until X = 0</span>
+  RTS</div>
+        </div>
+
+        <div class="ex-card difficulty-simple" data-diff="simple">
+            <span class="diff-badge badge-simple">SIMPLE</span>
+            <h3>5. Read Joystick Port 2</h3>
+            <div class="code-block">  LDA $DC00       <span class="comment">; joy2: CIA1 port A</span>
+  AND #$1F        <span class="comment">; mask to 5 direction bits</span>
+  EOR #$1F        <span class="comment">; invert (0=pressed)</span>
+  <span class="comment">; Bit 0=Up 1=Down 2=Left</span>
+  <span class="comment">; Bit 3=Right 4=Fire</span>
+  STA $C000       <span class="comment">; save result</span>
+  RTS</div>
+        </div>
+
+        <div class="ex-card difficulty-simple" data-diff="simple">
+            <span class="diff-badge badge-simple">SIMPLE</span>
+            <h3>6. Enable / Disable Sprites</h3>
+            <div class="code-block">  LDA #$FF        <span class="comment">; all 8 sprites on</span>
+  STA $D015       <span class="comment">; sprite enable reg</span>
+  <span class="comment">; To disable sprite 0 only:</span>
+  LDA $D015
+  AND #$FE        <span class="comment">; clear bit 0</span>
+  STA $D015
+  RTS</div>
+        </div>
+
+        <div class="ex-card difficulty-simple" data-diff="simple">
+            <span class="diff-badge badge-simple">SIMPLE</span>
+            <h3>7. SID: Play a Note</h3>
+            <div class="code-block">  LDA #$00
+  STA $D418       <span class="comment">; mute first</span>
+  LDA #$21        <span class="comment">; freq lo (middle-A ≈ $1D0C)</span>
+  STA $D400
+  LDA #$1D
+  STA $D401       <span class="comment">; freq hi</span>
+  LDA #$21        <span class="comment">; sawtooth + gate on</span>
+  STA $D404
+  LDA #$F0        <span class="comment">; attack=15, decay=0</span>
+  STA $D405
+  LDA #$F0        <span class="comment">; sustain=15, release=0</span>
+  STA $D406
+  LDA #$0F        <span class="comment">; volume = max</span>
+  STA $D418
+  RTS</div>
+        </div>
+
+        <div class="ex-card difficulty-simple" data-diff="simple">
+            <span class="diff-badge badge-simple">SIMPLE</span>
+            <h3>8. Fill Screen with Character</h3>
+            <div class="code-block">  LDA #$A0        <span class="comment">; PETSCII space (inverted)</span>
+  LDX #$00        <span class="comment">; index 0..249</span>
+<span class="label">loop:</span>
+  STA $0400,X     <span class="comment">; screen rows 0-1</span>
+  STA $04FA,X     <span class="comment">; rows 2-3</span>
+  STA $05F4,X     <span class="comment">; rows 4-5</span>
+  STA $06EE,X     <span class="comment">; rows 6-7</span>
+  INX
+  BNE loop        <span class="comment">; 1000 chars in 4 passes</span>
+  RTS</div>
+        </div>
+
+        <div class="ex-card difficulty-simple" data-diff="simple">
+            <span class="diff-badge badge-simple">SIMPLE</span>
+            <h3>9. Position Sprite 0</h3>
+            <div class="code-block">  LDA #160        <span class="comment">; X = 160 (centre)</span>
+  STA $D000       <span class="comment">; sprite 0 X lo</span>
+  LDA #$00
+  STA $D010       <span class="comment">; clear X MSB bits</span>
+  LDA #120        <span class="comment">; Y = 120</span>
+  STA $D001       <span class="comment">; sprite 0 Y</span>
+  LDA #$01
+  STA $D015       <span class="comment">; enable sprite 0</span>
+  RTS</div>
+        </div>
+
+        <div class="ex-card difficulty-simple" data-diff="simple">
+            <span class="diff-badge badge-simple">SIMPLE</span>
+            <h3>10. Simple Delay Loop</h3>
+            <div class="code-block">  LDX #$00        <span class="comment">; outer count</span>
+<span class="label">outer:</span>
+  LDY #$00        <span class="comment">; inner count</span>
+<span class="label">inner:</span>
+  DEY
+  BNE inner       <span class="comment">; 256 × inner loops</span>
+  DEX
+  BNE outer       <span class="comment">; × outer = 65536 iters</span>
+  RTS             <span class="comment">; ≈ 1.3M cycles / ~1.3 sec</span></div>
+        </div>
+
+        </div><!-- end simple grid -->
+
+        <!-- ====== INTERMEDIATE ====== -->
+        <h3 style="color:var(--c64-illegal);margin-top:24px">▼ INTERMEDIATE</h3>
+        <div class="ex-grid">
+
+        <div class="ex-card difficulty-intermediate" data-diff="intermediate">
+            <span class="diff-badge badge-intermediate">INTERMEDIATE</span>
+            <h3>11. Raster IRQ Setup</h3>
+            <div class="code-block">  SEI             <span class="comment">; disable IRQs</span>
+  LDA #$7F
+  STA $DC0D       <span class="comment">; disable CIA1 timer IRQ</span>
+  LDA #$01
+  STA $D01A       <span class="comment">; enable VIC raster IRQ</span>
+  LDA #100        <span class="comment">; trigger at line 100</span>
+  STA $D012
+  LDA $D011
+  AND #$7F        <span class="comment">; clear raster bit 8</span>
+  STA $D011
+  LDA #&lt;irq_handler
+  STA $0314       <span class="comment">; IRQ vector lo</span>
+  LDA #&gt;irq_handler
+  STA $0315       <span class="comment">; IRQ vector hi</span>
+  CLI             <span class="comment">; re-enable IRQs</span>
+  RTS
+
+<span class="label">irq_handler:</span>
+  LDA #$01
+  STA $D019       <span class="comment">; acknowledge raster IRQ</span>
+  <span class="comment">; ... your IRQ code here ...</span>
+  JMP $EA31       <span class="comment">; chain to KERNAL IRQ</span></div>
+        </div>
+
+        <div class="ex-card difficulty-intermediate" data-diff="intermediate">
+            <span class="diff-badge badge-intermediate">INTERMEDIATE</span>
+            <h3>12. X-Scroll (Fine Scroll)</h3>
+            <div class="code-block"><span class="label">scroll_x:</span>
+  LDA xscroll     <span class="comment">; current scroll 0-7</span>
+  SEC
+  SBC #1
+  AND #$07        <span class="comment">; wrap 0-7</span>
+  STA xscroll
+  LDA $D016
+  AND #$F8        <span class="comment">; clear scroll bits</span>
+  ORA xscroll     <span class="comment">; set new scroll</span>
+  STA $D016
+  <span class="comment">; when xscroll wraps 0→7:</span>
+  <span class="comment">; shift screen RAM left 1 col</span>
+  RTS
+
+<span class="label">xscroll:</span>
+  <span class="directive">.byte</span> 7</div>
+        </div>
+
+        <div class="ex-card difficulty-intermediate" data-diff="intermediate">
+            <span class="diff-badge badge-intermediate">INTERMEDIATE</span>
+            <h3>13. Sprite Animation (Frame Cycle)</h3>
+            <div class="code-block"><span class="label">anim_update:</span>
+  LDA frame_ctr
+  CLC
+  ADC #1
+  STA frame_ctr
+  CMP #4          <span class="comment">; 4 frames</span>
+  BCC done
+  LDA #0
+  STA frame_ctr
+<span class="label">done:</span>
+  LDX frame_ctr
+  LDA frames,X   <span class="comment">; pointer table</span>
+  STA $07F8       <span class="comment">; sprite 0 pointer</span>
+  RTS
+
+<span class="label">frame_ctr:</span> <span class="directive">.byte</span> 0
+<span class="label">frames:</span>    <span class="directive">.byte</span> 13,14,15,14 <span class="comment">; block×64=addr</span></div>
+        </div>
+
+        <div class="ex-card difficulty-intermediate" data-diff="intermediate">
+            <span class="diff-badge badge-intermediate">INTERMEDIATE</span>
+            <h3>14. 16-bit Addition</h3>
+            <div class="code-block">  <span class="comment">; val16 = val16 + 300</span>
+  CLC
+  LDA val16       <span class="comment">; lo byte</span>
+  ADC #&lt;300       <span class="comment">; lo of 300 ($2C)</span>
+  STA val16
+  LDA val16+1     <span class="comment">; hi byte</span>
+  ADC #&gt;300       <span class="comment">; hi of 300 ($01)</span>
+  STA val16+1
+  <span class="comment">; carry propagates automatically</span>
+  RTS
+
+<span class="label">val16:</span> <span class="directive">.word</span> 0</div>
+        </div>
+
+        <div class="ex-card difficulty-intermediate" data-diff="intermediate">
+            <span class="diff-badge badge-intermediate">INTERMEDIATE</span>
+            <h3>15. Indirect Y Copy (Pointer)</h3>
+            <div class="code-block">  <span class="comment">; copy 256 bytes via pointer</span>
+  LDA #&lt;source    <span class="comment">; set ZP pointer</span>
+  STA $FB
+  LDA #&gt;source
+  STA $FC
+  LDA #&lt;dest
+  STA $FD
+  LDA #&gt;dest
+  STA $FE
+  LDY #$00
+<span class="label">copy:</span>
+  LDA ($FB),Y
+  STA ($FD),Y
+  INY
+  BNE copy        <span class="comment">; 256 bytes</span>
+  RTS
+
+<span class="label">source:</span> <span class="directive">.res</span> 256
+<span class="label">dest:</span>   <span class="directive">.res</span> 256</div>
+        </div>
+
+        <div class="ex-card difficulty-intermediate" data-diff="intermediate">
+            <span class="diff-badge badge-intermediate">INTERMEDIATE</span>
+            <h3>16. Keyboard Input Poll</h3>
+            <div class="code-block"><span class="label">getkey:</span>
+  JSR $FFE4       <span class="comment">; KERNAL GETIN</span>
+  CMP #0          <span class="comment">; buffer empty?</span>
+  BEQ getkey      <span class="comment">; spin-wait</span>
+  <span class="comment">; A now holds PETSCII key</span>
+  CMP #$11        <span class="comment">; cursor down</span>
+  BEQ move_down
+  CMP #$91        <span class="comment">; cursor up</span>
+  BEQ move_up
+  RTS
+
+<span class="label">move_down:</span> <span class="comment">; ... handle down</span>
+  RTS
+<span class="label">move_up:</span>   <span class="comment">; ... handle up</span>
+  RTS</div>
+        </div>
+
+        <div class="ex-card difficulty-intermediate" data-diff="intermediate">
+            <span class="diff-badge badge-intermediate">INTERMEDIATE</span>
+            <h3>17. VIC Bank Switch (Bank 1)</h3>
+            <div class="code-block">  <span class="comment">; Bank 1 = $4000-$7FFF</span>
+  LDA $DD00       <span class="comment">; CIA2 port A</span>
+  AND #$FC        <span class="comment">; clear bits 0-1</span>
+  ORA #$02        <span class="comment">; %10 = bank 1 (inverted)</span>
+  STA $DD00
+  <span class="comment">; Now set screen to $6000:</span>
+  <span class="comment">; ($6000-$4000)/$400 = 8</span>
+  LDA #$82        <span class="comment">; screen at offset 8 ($6000)</span>
+  <span class="comment">; bits 4-7 = 8 = %1000</span>
+  <span class="comment">; bits 1-3 = 1 = $1000 charset</span>
+  STA $D018
+  RTS</div>
+        </div>
+
+        <div class="ex-card difficulty-intermediate" data-diff="intermediate">
+            <span class="diff-badge badge-intermediate">INTERMEDIATE</span>
+            <h3>18. Sine-Based Sprite Y Movement</h3>
+            <div class="code-block"><span class="label">move_sprite:</span>
+  LDX sine_idx
+  LDA sine_table,X  <span class="comment">; 0-255 sine</span>
+  STA $D001         <span class="comment">; sprite 0 Y</span>
+  INX
+  STX sine_idx
+  RTS
+
+<span class="label">sine_idx:</span> <span class="directive">.byte</span> 0
+
+<span class="comment">; 256-entry sine table (0-255 range)</span>
+<span class="comment">; generated: 128 + 127*sin(i*2π/256)</span>
+<span class="label">sine_table:</span>
+  <span class="directive">.byte</span> 128,131,134,137 <span class="comment">; ...</span>
+  <span class="comment">; full 256-byte table required</span></div>
+        </div>
+
+        <div class="ex-card difficulty-intermediate" data-diff="intermediate">
+            <span class="diff-badge badge-intermediate">INTERMEDIATE</span>
+            <h3>19. SID ADSR Note with Release</h3>
+            <div class="code-block">  <span class="comment">; Gate ON then OFF for pluck</span>
+  LDA #$9A        <span class="comment">; freq lo (A-4 PAL)</span>
+  STA $D400
+  LDA #$24        <span class="comment">; freq hi</span>
+  STA $D401
+  LDA #$11        <span class="comment">; triangle + gate ON</span>
+  STA $D404
+  LDA #$02        <span class="comment">; attack=0, decay=2</span>
+  STA $D405
+  LDA #$90        <span class="comment">; sustain=9, release=0</span>
+  STA $D406
+  LDA #$0F
+  STA $D418       <span class="comment">; max volume</span>
+  <span class="comment">; ... wait N frames ...</span>
+  LDA #$10        <span class="comment">; triangle + gate OFF</span>
+  STA $D404       <span class="comment">; triggers release phase</span>
+  RTS</div>
+        </div>
+
+        <div class="ex-card difficulty-intermediate" data-diff="intermediate">
+            <span class="diff-badge badge-intermediate">INTERMEDIATE</span>
+            <h3>20. Color RAM Strip Across Row</h3>
+            <div class="code-block">  <span class="comment">; Write 16 colors along row 0</span>
+  LDX #$00
+<span class="label">cloop:</span>
+  TXA             <span class="comment">; color = index mod 16</span>
+  AND #$0F
+  STA $D800,X     <span class="comment">; color RAM row 0</span>
+  INX
+  CPX #40         <span class="comment">; 40 chars/row</span>
+  BCC cloop
+  RTS</div>
+        </div>
+
+        </div><!-- end intermediate grid -->
+
+        <!-- ====== ADVANCED ====== -->
+        <h3 style="color:#ff4444;margin-top:24px">▼ ADVANCED</h3>
+        <div class="ex-grid">
+
+        <div class="ex-card difficulty-advanced" data-diff="advanced">
+            <span class="diff-badge badge-advanced">ADVANCED</span>
+            <h3>21. Multi-Raster IRQ (Split Screen)</h3>
+            <div class="code-block"><span class="label">irq_1:</span>                 <span class="comment">; fires at line 100</span>
+  LDA #$01
+  STA $D019       <span class="comment">; ack IRQ</span>
+  LDA #$06        <span class="comment">; Blue border top</span>
+  STA $D020
+  LDA #200        <span class="comment">; set next trigger</span>
+  STA $D012
+  LDA #&lt;irq_2
+  STA $0314
+  LDA #&gt;irq_2
+  STA $0315
+  JMP $EA31
+
+<span class="label">irq_2:</span>                 <span class="comment">; fires at line 200</span>
+  LDA #$01
+  STA $D019
+  LDA #$0E        <span class="comment">; Light Blue border</span>
+  STA $D020
+  LDA #100        <span class="comment">; reset trigger</span>
+  STA $D012
+  LDA #&lt;irq_1
+  STA $0314
+  LDA #&gt;irq_1
+  STA $0315
+  JMP $EA31</div>
+        </div>
+
+        <div class="ex-card difficulty-advanced" data-diff="advanced">
+            <span class="diff-badge badge-advanced">ADVANCED</span>
+            <h3>22. 8-Sprite Starfield (Multiplexing Prep)</h3>
+            <div class="code-block"><span class="comment">; Sort stars by Y, assign sprites</span>
+<span class="comment">; to top 8. Called from raster IRQ.</span>
+<span class="label">update_stars:</span>
+  LDX #7          <span class="comment">; 8 sprites (0-7)</span>
+<span class="label">star_loop:</span>
+  LDA star_y,X
+  STA $D001,X     <span class="comment">; !! must use lut</span>
+  <span class="comment">; actual: $D001 $D003 $D005...</span>
+  LDA star_x,X
+  STA $D000,X     <span class="comment">; X positions</span>
+  LDA star_y,X
+  CLC
+  ADC #2          <span class="comment">; move star down</span>
+  STA star_y,X
+  CMP #$FF        <span class="comment">; off bottom?</span>
+  BCC no_reset
+  LDA #$30        <span class="comment">; reset to top</span>
+  STA star_y,X
+<span class="label">no_reset:</span>
+  DEX
+  BPL star_loop
+  RTS
+
+<span class="label">star_x:</span> <span class="directive">.byte</span> 40,80,120,160,200,240,30,90
+<span class="label">star_y:</span> <span class="directive">.byte</span> 50,80,130,30,200,60,170,110</div>
+        </div>
+
+        <div class="ex-card difficulty-advanced" data-diff="advanced">
+            <span class="diff-badge badge-advanced">ADVANCED</span>
+            <h3>23. CIA1 Timer A for SID IRQ</h3>
+            <div class="code-block">  <span class="comment">; 50Hz tick via CIA1 Timer A</span>
+  <span class="comment">; PAL: 985248 / 50 = 19704 cycles</span>
+  SEI
+  LDA #$7F
+  STA $DC0D       <span class="comment">; disable all CIA1 IRQs</span>
+  LDA #&lt;19704     <span class="comment">; $4CF8 lo</span>
+  STA $DC04
+  LDA #&gt;19704     <span class="comment">; hi</span>
+  STA $DC05
+  LDA #$81        <span class="comment">; set Timer A IRQ enable</span>
+  STA $DC0D
+  LDA #$01        <span class="comment">; start timer, continuous</span>
+  STA $DC0E
+  LDA #&lt;sid_irq
+  STA $0314
+  LDA #&gt;sid_irq
+  STA $0315
+  LDA #$00        <span class="comment">; disable VIC raster IRQ</span>
+  STA $D01A
+  CLI
+  RTS
+
+<span class="label">sid_irq:</span>
+  LDA $DC0D       <span class="comment">; read+ack CIA1 IRQ</span>
+  JSR sid_play    <span class="comment">; call music driver</span>
+  JMP $EA31</div>
+        </div>
+
+        <div class="ex-card difficulty-advanced" data-diff="advanced">
+            <span class="diff-badge badge-advanced">ADVANCED</span>
+            <h3>24. Bitmap Mode Setup</h3>
+            <div class="code-block">  <span class="comment">; Hires bitmap at $E000 (bank 3)</span>
+  LDA $DD00
+  AND #$FC
+  ORA #$00        <span class="comment">; bank 3 ($C000-$FFFF)</span>
+  STA $DD00
+  <span class="comment">; $D018: bitmap at $E000 offset</span>
+  <span class="comment">; ($E000-$C000)/$2000 = 7 → bits 3</span>
+  <span class="comment">; screen color at $C000: offset 0</span>
+  LDA #$08        <span class="comment">; bits 1-3=%100 → $8000</span>
+  <span class="comment">; Actually: %0001_1000 =</span>
+  <span class="comment">; screen offset 1 ($C400)</span>
+  <span class="comment">; bitmap offset 3 ($E000... no)</span>
+  <span class="comment">; Use $18 = screen$C000/bitmap$E000</span>
+  LDA #$3B        <span class="comment">; enable bitmap mode</span>
+  STA $D011       <span class="comment">; bit 5=bitmap on</span>
+  LDA #$08
+  STA $D016       <span class="comment">; bit 3=38 col, no multicolor</span>
+  RTS</div>
+        </div>
+
+        <div class="ex-card difficulty-advanced" data-diff="advanced">
+            <span class="diff-badge badge-advanced">ADVANCED</span>
+            <h3>25. Music Driver Hook (GoatTracker Style)</h3>
+            <div class="code-block"><span class="comment">; Minimal 3-voice SID player frame</span>
+<span class="comment">; Called at 50Hz from IRQ</span>
+<span class="label">sid_play:</span>
+  PHA             <span class="comment">; save regs</span>
+  TXA : PHA
+  TYA : PHA
+  JSR sid_update_v1
+  JSR sid_update_v2
+  JSR sid_update_v3
+  PLA : TAY
+  PLA : TAX
+  PLA
+  RTS
+
+<span class="label">sid_update_v1:</span>
+  LDA seq_pos     <span class="comment">; sequence position</span>
+  TAX
+  LDA notes,X     <span class="comment">; frequency lo from table</span>
+  STA $D400
+  LDA notes+1,X
+  STA $D401
+  INC seq_pos
+  INC seq_pos     <span class="comment">; 2 bytes per note</span>
+  RTS
+<span class="label">seq_pos:</span> <span class="directive">.byte</span> 0
+<span class="label">notes:</span>   <span class="directive">.word</span> $1D0C,$21BE,$2710 <span class="comment">; A,B,C...</span></div>
+        </div>
+
+        <div class="ex-card difficulty-advanced" data-diff="advanced">
+            <span class="diff-badge badge-advanced">ADVANCED</span>
+            <h3>26. NMI Trap (Disable RESTORE)</h3>
+            <div class="code-block">  <span class="comment">; RESTORE key causes NMI via $FFFA</span>
+  <span class="comment">; To intercept it:</span>
+  SEI
+  LDA #&lt;nmi_handler
+  STA $0318       <span class="comment">; NMI vector lo</span>
+  LDA #&gt;nmi_handler
+  STA $0319       <span class="comment">; NMI vector hi</span>
+  CLI
+  RTS
+
+<span class="label">nmi_handler:</span>
+  <span class="comment">; Save regs, do cleanup</span>
+  PHA
+  TXA : PHA
+  TYA : PHA
+  <span class="comment">; optionally check $DD0D (CIA2)</span>
+  LDA $DD0D       <span class="comment">; ack CIA2 NMI source</span>
+  <span class="comment">; Ignore or handle RESTORE:</span>
+  PLA : TAY
+  PLA : TAX
+  PLA
+  RTI             <span class="comment">; RTI not RTS for NMI</span></div>
+        </div>
+
+        <div class="ex-card difficulty-advanced" data-diff="advanced">
+            <span class="diff-badge badge-advanced">ADVANCED</span>
+            <h3>27. SAX Illegal Opcode Use</h3>
+            <div class="code-block"><span class="comment">; SAX $zp: store (A AND X) to ZP</span>
+<span class="comment">; Saves a byte vs LDA/AND/STA</span>
+  LDA #$0F        <span class="comment">; mask in A</span>
+  LDX color_val   <span class="comment">; color in X</span>
+  <span class="comment">; Normal way (3 bytes extra):</span>
+  <span class="comment">; TXA / AND #$0F / STA $D020</span>
+  <span class="comment">; Illegal way (saves 2 bytes):</span>
+  <span class="directive">.byte</span> $87,$20   <span class="comment">; SAX $20 (zp)</span>
+  <span class="comment">; Stores (A AND X) = low nibble</span>
+  <span class="comment">; of color_val at $0020</span>
+  LDA $0020
+  STA $D020       <span class="comment">; border = masked color</span>
+  RTS
+<span class="label">color_val:</span> <span class="directive">.byte</span> $2F</div>
+        </div>
+
+        <div class="ex-card difficulty-advanced" data-diff="advanced">
+            <span class="diff-badge badge-advanced">ADVANCED</span>
+            <h3>28. Sprite Pointer Table (VIC Bank 1)</h3>
+            <div class="code-block"><span class="comment">; In bank 1 ($4000-$7FFF)</span>
+<span class="comment">; sprite ptrs at $67F8-$67FF</span>
+<span class="comment">; sprite data addr = ptr × 64</span>
+<span class="comment">; $6800 = ptr $A2 (162)</span>
+<span class="label">set_sprite_ptrs:</span>
+  LDX #7
+<span class="label">sptr_loop:</span>
+  LDA sprite_ptrs,X
+  STA $67F8,X     <span class="comment">; screen_base-8</span>
+  DEX
+  BPL sptr_loop
+  RTS
+
+<span class="label">sprite_ptrs:</span>
+  <span class="directive">.byte</span> $A2,$A3,$A4,$A5,$A6,$A7,$A8,$A9
+  <span class="comment">; → $6800,$6840,$6880...</span>
+  <span class="comment">; 8 different sprite shapes</span></div>
+        </div>
+
+        <div class="ex-card difficulty-advanced" data-diff="advanced">
+            <span class="diff-badge badge-advanced">ADVANCED</span>
+            <h3>29. DCP Illegal for Fast Decrement-Compare</h3>
+            <div class="code-block"><span class="comment">; DCP: DEC memory then CMP A</span>
+<span class="comment">; One instruction instead of two</span>
+  LDA #$10        <span class="comment">; compare value</span>
+  <span class="comment">; Normal (2 instructions):</span>
+  <span class="comment">; DEC counter / CMP counter</span>
+  <span class="comment">; DCP (1 instruction, saves 1 byte)</span>
+  <span class="directive">.byte</span> $C7,$C0   <span class="comment">; DCP $C0 (zp)</span>
+  <span class="comment">; Decrements $C0 then CMPs A with</span>
+  <span class="comment">; new value. BEQ/BCC work normally</span>
+  BEQ hit_zero
+  BCC below_threshold
+  RTS
+<span class="label">hit_zero:</span>
+  <span class="comment">; counter just reached $10</span>
+  RTS
+<span class="label">below_threshold:</span>
+  RTS</div>
+        </div>
+
+        <div class="ex-card difficulty-advanced" data-diff="advanced">
+            <span class="diff-badge badge-advanced">ADVANCED</span>
+            <h3>30. Full IRQ + SID + Starfield Frame</h3>
+            <div class="code-block"><span class="comment">; Main loop: everything driven by IRQ</span>
+<span class="label">main:</span>
+  CLI
+<span class="label">idle:</span>
+  JMP idle        <span class="comment">; do nothing, IRQ does work</span>
+
+<span class="label">frame_irq:</span>          <span class="comment">; raster IRQ handler</span>
+  LDA #$01
+  STA $D019       <span class="comment">; ack</span>
+  INC frame_cnt
+  JSR update_stars
+  JSR scroll_border
+  JSR check_joy
+  <span class="comment">; SID handled by separate CIA1 IRQ</span>
+  JMP $EA31
+
+<span class="label">scroll_border:</span>
+  LDA frame_cnt
+  AND #$07        <span class="comment">; 8-color cycle</span>
+  STA $D020
+  RTS
+
+<span class="label">check_joy:</span>
+  LDA $DC00
+  EOR #$1F
+  AND #$10        <span class="comment">; fire button</span>
+  BEQ no_fire
+  INC $D021       <span class="comment">; cycle bg on fire</span>
+<span class="label">no_fire:</span>
+  RTS
+
+<span class="label">frame_cnt:</span> <span class="directive">.byte</span> 0</div>
+        </div>
+
+        </div><!-- end advanced grid -->
+        </div><!-- end scrollbox -->
+    </div>
+
+</div><!-- end container -->
+
+<script>
+    function openTab(evt, tabName) {
+        var i, tc, tb;
+        tc = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tc.length; i++) tc[i].classList.remove("active");
+        tb = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tb.length; i++) tb[i].classList.remove("active");
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    function searchTable(inputId, tableId) {
+        var input = document.getElementById(inputId);
+        var filter = input.value.toUpperCase();
+        var table = document.getElementById(tableId);
+        var tr = table.getElementsByTagName("tr");
+        for (var i = 1; i < tr.length; i++) {
+            var found = false;
+            var td = tr[i].getElementsByTagName("td");
+            for (var j = 0; j < td.length; j++) {
+                if (td[j] && (td[j].textContent || td[j].innerText).toUpperCase().indexOf(filter) > -1) {
+                    found = true; break;
+                }
+            }
+            tr[i].style.display = found ? "" : "none";
+        }
+    }
+
+    function filterEx(diff) {
+        var cards = document.querySelectorAll('.ex-card');
+        cards.forEach(function(c) {
+            c.style.display = (diff === 'all' || c.dataset.diff === diff) ? '' : 'none';
+        });
+        ['all','simple','intermediate','advanced'].forEach(function(d) {
+            document.getElementById('f-'+d).classList.toggle('active', d === diff);
+        });
+    }
+</script>
+</body>
+</html>
