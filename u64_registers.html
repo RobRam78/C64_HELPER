@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>U64 Register Reference — C64 Dev Machine</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=VT323&display=swap');
+
+  :root {
+    --c64-blue:     #4040e8;
+    --c64-light:    #7070f0;
+    --c64-bg:       #0000a8;
+    --screen-bg:    #000080;
+    --phosphor:     #6af7ff;
+    --phosphor-dim: #2a8f9f;
+    --amber:        #ffb347;
+    --amber-dim:    #994400;
+    --white:        #d0d0ff;
+    --border:       #5050c0;
+    --panel:        #00006a;
+    --green:        #44ff44;
+    --red:          #ff4444;
+    --row-alt:      rgba(100,180,255,0.05);
+    --scanline:     rgba(0,0,0,0.18);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: #000014;
+    color: var(--white);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 2px,
+      var(--scanline) 2px,
+      var(--scanline) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* CRT vignette */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,20,0.7) 100%);
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  .outer {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+  }
+
+  .logo-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+
+  .logo-badge {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--amber);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 900;
+    color: var(--amber);
+    letter-spacing: 0.05em;
+    animation: pulse-amber 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-amber {
+    0%, 100% { box-shadow: 0 0 6px var(--amber-dim); }
+    50% { box-shadow: 0 0 18px var(--amber), 0 0 36px rgba(255,180,70,0.3); }
+  }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(18px, 4vw, 30px);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    color: var(--phosphor);
+    text-shadow: 0 0 12px var(--phosphor), 0 0 28px rgba(106,247,255,0.4);
+    animation: flicker 8s infinite;
+  }
+
+  @keyframes flicker {
+    0%,97%,100% { opacity: 1; }
+    98% { opacity: 0.85; }
+    99% { opacity: 1; }
+    99.5% { opacity: 0.7; }
+  }
+
+  .subtitle {
+    font-family: 'VT323', monospace;
+    font-size: 20px;
+    color: var(--amber);
+    letter-spacing: 0.15em;
+    margin-top: 4px;
+    opacity: 0.85;
+  }
+
+  .divider {
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--phosphor-dim), var(--phosphor), var(--phosphor-dim), transparent);
+    margin: 20px 0;
+    box-shadow: 0 0 8px var(--phosphor-dim);
+  }
+
+  /* ─── INTRO BOX ─── */
+  .intro {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--phosphor);
+    padding: 14px 18px;
+    margin-bottom: 36px;
+    font-size: 13px;
+    color: var(--white);
+    line-height: 1.7;
+  }
+
+  .intro code {
+    color: var(--phosphor);
+    background: rgba(106,247,255,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  /* ─── SECTION ─── */
+  section {
+    margin-bottom: 44px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .section-tag {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    background: var(--c64-blue);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  .section-tag.amber { background: #7a4800; color: var(--amber); }
+  .section-tag.green { background: #003800; color: var(--green); }
+  .section-tag.red   { background: #4a0000; color: var(--red); }
+
+  h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(12px, 2.5vw, 16px);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    text-shadow: 0 0 8px rgba(255,180,70,0.5);
+  }
+
+  .addr-range {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--phosphor-dim);
+    margin-left: auto;
+  }
+
+  /* ─── TABLES ─── */
+  .reg-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .reg-table thead tr {
+    background: rgba(64,64,232,0.5);
+    border-bottom: 2px solid var(--c64-light);
+  }
+
+  .reg-table th {
+    padding: 8px 12px;
+    text-align: left;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--phosphor);
+  }
+
+  .reg-table td {
+    padding: 8px 12px;
+    vertical-align: top;
+    border-bottom: 1px solid rgba(80,80,192,0.35);
+  }
+
+  .reg-table tr:nth-child(even) td { background: var(--row-alt); }
+
+  .reg-table tr:hover td {
+    background: rgba(106,247,255,0.08);
+    transition: background 0.15s;
+  }
+
+  .addr {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--phosphor);
+    white-space: nowrap;
+    font-size: 13px;
+    text-shadow: 0 0 6px rgba(106,247,255,0.5);
+  }
+
+  .reg-name {
+    color: var(--amber);
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  .reg-desc {
+    color: #b0b8d0;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  .reg-desc code {
+    color: var(--phosphor);
+    background: rgba(106,247,255,0.07);
+    padding: 0 4px;
+    border-radius: 2px;
+    font-size: 12px;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 9px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 1px 5px;
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .badge.r  { background: #003800; color: var(--green); }
+  .badge.w  { background: #4a0000; color: var(--red); }
+  .badge.rw { background: #1a1a50; color: var(--c64-light); }
+
+  /* ─── SPEED TABLE ─── */
+  .speed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .speed-cell {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+  }
+
+  .speed-idx {
+    color: var(--phosphor-dim);
+    font-size: 11px;
+  }
+
+  .speed-val {
+    color: var(--amber);
+    font-weight: bold;
+  }
+
+  /* ─── CALLOUT BOXES ─── */
+  .callout {
+    border: 1px solid;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .callout.info {
+    border-color: var(--c64-light);
+    border-left: 4px solid var(--c64-light);
+    background: rgba(64,64,232,0.12);
+  }
+
+  .callout.warn {
+    border-color: var(--amber);
+    border-left: 4px solid var(--amber);
+    background: rgba(255,180,70,0.07);
+  }
+
+  .callout.tip {
+    border-color: var(--green);
+    border-left: 4px solid var(--green);
+    background: rgba(68,255,68,0.06);
+  }
+
+  .callout-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    margin-bottom: 5px;
+  }
+
+  .callout.info .callout-label  { color: var(--c64-light); }
+  .callout.warn .callout-label  { color: var(--amber); }
+  .callout.tip  .callout-label  { color: var(--green); }
+
+  .callout code {
+    color: var(--phosphor);
+    background: rgba(106,247,255,0.08);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  /* ─── NODE IDEAS ─── */
+  .node-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .node-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--c64-light);
+    padding: 14px 16px;
+  }
+
+  .node-card.priority { border-top-color: var(--amber); }
+
+  .node-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--phosphor);
+    margin-bottom: 8px;
+  }
+
+  .node-card.priority .node-title { color: var(--amber); }
+
+  .node-desc {
+    font-size: 12px;
+    color: #a0a8c0;
+    line-height: 1.55;
+  }
+
+  .node-regs {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--phosphor-dim);
+  }
+
+  /* ─── PROTOCOL STATE MACHINE ─── */
+  .state-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 12px 0;
+    flex-wrap: wrap;
+  }
+
+  .state-box {
+    background: var(--panel);
+    border: 1px solid var(--c64-light);
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--phosphor);
+    white-space: nowrap;
+  }
+
+  .state-arrow {
+    color: var(--phosphor-dim);
+    font-size: 16px;
+    padding: 0 4px;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    text-align: center;
+    color: var(--phosphor-dim);
+    font-size: 12px;
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    letter-spacing: 0.1em;
+  }
+
+  footer .blink {
+    animation: blink 1s step-end infinite;
+    color: var(--phosphor);
+  }
+
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+  /* ─── NAV ─── */
+  .toc {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 14px 18px;
+    margin-bottom: 36px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 6px;
+  }
+
+  .toc a {
+    color: var(--c64-light);
+    text-decoration: none;
+    font-size: 12px;
+    display: block;
+    padding: 3px 0;
+    border-bottom: 1px dotted rgba(80,80,192,0.4);
+  }
+
+  .toc a:hover { color: var(--phosphor); }
+
+  .toc-header {
+    grid-column: 1 / -1;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--phosphor-dim);
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="outer">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-bar">
+      <div class="logo-badge">C64</div>
+      <h1>U64 REGISTER REFERENCE</h1>
+      <div class="logo-badge">U64</div>
+    </div>
+    <div class="subtitle">C64 Dev Machine · Polytricity Ltd</div>
+    <div class="divider"></div>
+  </header>
+
+  <!-- INTRO -->
+  <div class="intro">
+    Two distinct layers of I/O registers are accessible from running 6502 code. The <strong>standard C64 chip registers</strong>
+    ($D000–$DDFF) are fully emulated by the U64. The <strong>U64-specific extension registers</strong> sit in the same address
+    space — $D030/$D031 for CPU turbo control, $DF00–$DF0A for REU DMA, and $DF1B–$DF1F for the Ultimate Command Interface.
+    All addresses assume <code>CHAREN=1</code> (I/O visible, not character ROM).
+  </div>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <div class="toc-header">CONTENTS</div>
+    <a href="#vic">VIC-II — $D000–$D02E</a>
+    <a href="#sid">SID — $D400–$D41C</a>
+    <a href="#cia1">CIA #1 — $DC00–$DC0F</a>
+    <a href="#cia2">CIA #2 — $DD00–$DD0F</a>
+    <a href="#turbo">U64 Turbo — $D030/$D031</a>
+    <a href="#reu">REU — $DF00–$DF0A</a>
+    <a href="#uci">UCI — $DF1B–$DF1F</a>
+    <a href="#nodes">Dev Machine Node Ideas</a>
+  </nav>
+
+  <!-- ═══════════════════════════════ VIC-II ═══════════════════════════════ -->
+  <section id="vic">
+    <div class="section-header">
+      <span class="section-tag">STANDARD C64</span>
+      <h2>VIC-II VIDEO CHIP</h2>
+      <span class="addr-range">$D000–$D02E</span>
+    </div>
+
+    <table class="reg-table">
+      <thead><tr>
+        <th>ADDRESS</th><th>REGISTER</th><th>NOTES</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="addr">$D000/$D001</td><td class="reg-name">Sprite 0 X / Y</td><td class="reg-desc">Screen position. X is 8-bit here; bit in $D010 provides 9th bit.</td></tr>
+        <tr><td class="addr">$D002–$D00D</td><td class="reg-name">Sprites 1–6 X / Y</td><td class="reg-desc">Same layout as sprite 0, pairs of X/Y bytes.</td></tr>
+        <tr><td class="addr">$D00E/$D00F</td><td class="reg-name">Sprite 7 X / Y</td><td class="reg-desc">Final sprite position pair.</td></tr>
+        <tr><td class="addr">$D010</td><td class="reg-name">Sprites X MSBs</td><td class="reg-desc"><span class="badge rw">R/W</span> One bit per sprite. Set bit N to extend sprite N X coordinate beyond pixel 255. Used in MACRO_ANIM for 9th-bit X handling.</td></tr>
+        <tr><td class="addr">$D011</td><td class="reg-name">VIC Control 1</td><td class="reg-desc"><span class="badge rw">R/W</span> Bit 7 = raster IRQ bit 8. Bit 6 = ECM. Bit 5 = BMM (bitmap mode). Bit 4 = DEN (display enable). Bit 3 = RSEL (25/24 rows). Bits 0–2 = YSCROLL.</td></tr>
+        <tr><td class="addr">$D012</td><td class="reg-name">Raster Counter</td><td class="reg-desc"><span class="badge rw">R/W</span> Read = current raster line (bits 0–7). Write = IRQ trigger line (combine with $D011 bit 7 for lines > 255).</td></tr>
+        <tr><td class="addr">$D013/$D014</td><td class="reg-name">Light Pen X / Y</td><td class="reg-desc"><span class="badge r">R</span> Latched pen position on trigger.</td></tr>
+        <tr><td class="addr">$D015</td><td class="reg-name">Sprite Enable</td><td class="reg-desc"><span class="badge rw">R/W</span> Bit per sprite. Set to show, clear to hide.</td></tr>
+        <tr><td class="addr">$D016</td><td class="reg-name">VIC Control 2</td><td class="reg-desc"><span class="badge rw">R/W</span> Bit 4 = MCM (multicolour text). Bit 3 = CSEL (40/38 cols). Bits 0–2 = XSCROLL. Key for MACRO_SCROLL fine-scroll logic.</td></tr>
+        <tr><td class="addr">$D017</td><td class="reg-name">Sprite Y Expansion</td><td class="reg-desc"><span class="badge rw">R/W</span> Doubles sprite height when bit set.</td></tr>
+        <tr><td class="addr">$D018</td><td class="reg-name">Memory Pointers</td><td class="reg-desc"><span class="badge rw">R/W</span> Bits 4–7 = screen RAM offset within VIC bank (×$0400). Bits 1–3 = charset/bitmap base (×$0800). Critical for VIC bank switching in MACRO_SPR.</td></tr>
+        <tr><td class="addr">$D019</td><td class="reg-name">IRQ Status</td><td class="reg-desc"><span class="badge rw">R/W</span> Bit 0 = raster IRQ pending. Bit 1 = sprite-bg collision. Bit 2 = sprite-sprite collision. Bit 3 = light pen. Write 1 to acknowledge.</td></tr>
+        <tr><td class="addr">$D01A</td><td class="reg-name">IRQ Enable Mask</td><td class="reg-desc"><span class="badge rw">R/W</span> Same bit layout as $D019. Set bit to enable that IRQ source.</td></tr>
+        <tr><td class="addr">$D01B</td><td class="reg-name">Sprite Priority</td><td class="reg-desc"><span class="badge rw">R/W</span> 0 = sprite in front of background, 1 = behind.</td></tr>
+        <tr><td class="addr">$D01C</td><td class="reg-name">Sprite Multicolour</td><td class="reg-desc"><span class="badge rw">R/W</span> Enable multicolour mode per sprite. Shared colours from $D025/$D026.</td></tr>
+        <tr><td class="addr">$D01D</td><td class="reg-name">Sprite X Expansion</td><td class="reg-desc"><span class="badge rw">R/W</span> Doubles sprite width when bit set.</td></tr>
+        <tr><td class="addr">$D01E</td><td class="reg-name">Sprite–Sprite Collision</td><td class="reg-desc"><span class="badge r">R</span> Bits set for colliding sprite pairs. Cleared on read.</td></tr>
+        <tr><td class="addr">$D01F</td><td class="reg-name">Sprite–BG Collision</td><td class="reg-desc"><span class="badge r">R</span> Set when sprite overlaps non-zero background pixel. Used in MACRO_COLL. Cleared on read.</td></tr>
+        <tr><td class="addr">$D020</td><td class="reg-name">Border Colour</td><td class="reg-desc"><span class="badge rw">R/W</span> Bits 0–3 only. 16 colours.</td></tr>
+        <tr><td class="addr">$D021</td><td class="reg-name">Background Colour 0</td><td class="reg-desc"><span class="badge rw">R/W</span> Main background colour for text and bitmap modes.</td></tr>
+        <tr><td class="addr">$D022–$D024</td><td class="reg-name">Background Colours 1–3</td><td class="reg-desc"><span class="badge rw">R/W</span> Extra background colours for ECM text mode.</td></tr>
+        <tr><td class="addr">$D025/$D026</td><td class="reg-name">Sprite Shared MC 0/1</td><td class="reg-desc"><span class="badge rw">R/W</span> Two shared multicolour values used by all MC sprites.</td></tr>
+        <tr><td class="addr">$D027–$D02E</td><td class="reg-name">Sprite 0–7 Colour</td><td class="reg-desc"><span class="badge rw">R/W</span> Individual colour for each sprite (bits 0–3).</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════ SID ═══════════════════════════════ -->
+  <section id="sid">
+    <div class="section-header">
+      <span class="section-tag">STANDARD C64</span>
+      <h2>SID SOUND CHIP</h2>
+      <span class="addr-range">$D400–$D41C</span>
+    </div>
+    <div class="callout info">
+      <div class="callout-label">U64 NOTE</div>
+      The U64 can emulate up to 4 SID chips at configurable addresses (e.g. <code>$D400</code>, <code>$D420</code>, <code>$D440</code>, <code>$D480</code> — set in the hardware menu). Second SID address is configurable. Your <code>MACRO_SID</code> node should target the address matching the U64's configured primary SID.
+    </div>
+    <table class="reg-table">
+      <thead><tr><th>ADDRESS</th><th>REGISTER</th><th>NOTES</th></tr></thead>
+      <tbody>
+        <tr><td class="addr">$D400/$D401</td><td class="reg-name">V1 Frequency Lo/Hi</td><td class="reg-desc">16-bit frequency. <code>freq = note_hz × 16777216 / clock</code> (PAL clock ≈ 985248 Hz).</td></tr>
+        <tr><td class="addr">$D402/$D403</td><td class="reg-name">V1 Pulse Width Lo/Hi</td><td class="reg-desc">12-bit pulse width (bits 0–11 of $D402/D403). 50% duty = $0800.</td></tr>
+        <tr><td class="addr">$D404</td><td class="reg-name">V1 Control</td><td class="reg-desc">Bit 0=Gate, 1=Sync, 2=Ring, 3=Test, 4=Tri, 5=Saw, 6=Pulse, 7=Noise.</td></tr>
+        <tr><td class="addr">$D405</td><td class="reg-name">V1 Attack/Decay</td><td class="reg-desc">High nibble=Attack (0–15), Low nibble=Decay (0–15).</td></tr>
+        <tr><td class="addr">$D406</td><td class="reg-name">V1 Sustain/Release</td><td class="reg-desc">High nibble=Sustain level, Low nibble=Release rate.</td></tr>
+        <tr><td class="addr">$D407–$D40D</td><td class="reg-name">Voice 2</td><td class="reg-desc">Same register layout as Voice 1.</td></tr>
+        <tr><td class="addr">$D40E–$D414</td><td class="reg-name">Voice 3</td><td class="reg-desc">Same register layout as Voice 1.</td></tr>
+        <tr><td class="addr">$D415/$D416</td><td class="reg-name">Filter Cutoff Lo/Hi</td><td class="reg-desc">11-bit cutoff. Lo = bits 0–2, Hi = bits 3–10.</td></tr>
+        <tr><td class="addr">$D417</td><td class="reg-name">Filter Resonance/Route</td><td class="reg-desc">High nibble=resonance. Bits 0–2=voice routing to filter. Bit 3=ext input.</td></tr>
+        <tr><td class="addr">$D418</td><td class="reg-name">Volume / Filter Mode</td><td class="reg-desc">Bits 0–3=master volume. Bits 4–6=filter type (LP/BP/HP). Bit 7=V3 off.</td></tr>
+        <tr><td class="addr">$D419/$D41A</td><td class="reg-name">Paddle X / Y</td><td class="reg-desc"><span class="badge r">R</span> Paddle pot values (0–255). Requires CIA port setup.</td></tr>
+        <tr><td class="addr">$D41B</td><td class="reg-name">V3 Oscillator Output</td><td class="reg-desc"><span class="badge r">R</span> Live waveform output of Voice 3. Useful for pseudo-random number generation.</td></tr>
+        <tr><td class="addr">$D41C</td><td class="reg-name">V3 Envelope Output</td><td class="reg-desc"><span class="badge r">R</span> Live envelope value of Voice 3 (0–255).</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════ CIA1 ═══════════════════════════════ -->
+  <section id="cia1">
+    <div class="section-header">
+      <span class="section-tag">STANDARD C64</span>
+      <h2>CIA #1 — KEYBOARD / JOYSTICK / IRQ</h2>
+      <span class="addr-range">$DC00–$DC0F</span>
+    </div>
+    <table class="reg-table">
+      <thead><tr><th>ADDRESS</th><th>REGISTER</th><th>NOTES</th></tr></thead>
+      <tbody>
+        <tr><td class="addr">$DC00</td><td class="reg-name">Port A</td><td class="reg-desc"><span class="badge rw">R/W</span> Keyboard column select (write) / Joystick Port 2 (read bits 0–4).</td></tr>
+        <tr><td class="addr">$DC01</td><td class="reg-name">Port B</td><td class="reg-desc"><span class="badge r">R</span> Keyboard row read / Joystick Port 1 (bits 0–4). Used in MACRO_JOY for port 1.</td></tr>
+        <tr><td class="addr">$DC02/$DC03</td><td class="reg-name">Data Direction A/B</td><td class="reg-desc"><span class="badge rw">R/W</span> 1 = output, 0 = input per bit.</td></tr>
+        <tr><td class="addr">$DC04/$DC05</td><td class="reg-name">Timer A Lo/Hi</td><td class="reg-desc"><span class="badge rw">R/W</span> 16-bit countdown timer. Used for CIA-based IRQ timing in MACRO_SID.</td></tr>
+        <tr><td class="addr">$DC06/$DC07</td><td class="reg-name">Timer B Lo/Hi</td><td class="reg-desc"><span class="badge rw">R/W</span> Second independent timer. Can count Timer A underflows.</td></tr>
+        <tr><td class="addr">$DC08–$DC0B</td><td class="reg-name">TOD Clock</td><td class="reg-desc"><span class="badge rw">R/W</span> Tenths, seconds, minutes, hours (BCD). Reading $DC08 latches all four.</td></tr>
+        <tr><td class="addr">$DC0C</td><td class="reg-name">Serial Data Register</td><td class="reg-desc"><span class="badge rw">R/W</span> Shift register for serial communication.</td></tr>
+        <tr><td class="addr">$DC0D</td><td class="reg-name">Interrupt Control</td><td class="reg-desc"><span class="badge rw">R/W</span> Read = IRQ status flags. Write bit 7=1 to set mask, =0 to clear. Bit 0=Timer A, 1=Timer B, 4=FLAG.</td></tr>
+        <tr><td class="addr">$DC0E</td><td class="reg-name">Control Register A</td><td class="reg-desc"><span class="badge rw">R/W</span> Bit 0=start Timer A. Bit 3=one-shot. Bit 4=load latch. Bit 5=timer mode.</td></tr>
+        <tr><td class="addr">$DC0F</td><td class="reg-name">Control Register B</td><td class="reg-desc"><span class="badge rw">R/W</span> Same as $DC0E but for Timer B. Bit 5–6 selects count source.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════ CIA2 ═══════════════════════════════ -->
+  <section id="cia2">
+    <div class="section-header">
+      <span class="section-tag">STANDARD C64</span>
+      <h2>CIA #2 — VIC BANK / SERIAL BUS / NMI</h2>
+      <span class="addr-range">$DD00–$DD0F</span>
+    </div>
+    <div class="callout tip">
+      <div class="callout-label">DEV MACHINE NOTE</div>
+      <code>$DD00</code> is the most important CIA2 register for VIC bank switching. Bits 0–1 are <em>inverted</em>: writing <code>%xxxxxx11</code> selects bank 0 ($0000), <code>%xxxxxx10</code> = bank 1 ($4000), <code>%xxxxxx01</code> = bank 2 ($8000), <code>%xxxxxx00</code> = bank 3 ($C000). Your <code>MACRO_SPR</code> already reads <code>$DD00</code> and <code>$D018</code> live to resolve sprite pointers at runtime.
+    </div>
+    <table class="reg-table">
+      <thead><tr><th>ADDRESS</th><th>REGISTER</th><th>NOTES</th></tr></thead>
+      <tbody>
+        <tr><td class="addr">$DD00</td><td class="reg-name">Port A</td><td class="reg-desc"><span class="badge rw">R/W</span> Bits 0–1 = VIC bank select (inverted). Bits 3–7 = serial bus lines (CLK, DATA, ATN, etc.).</td></tr>
+        <tr><td class="addr">$DD01</td><td class="reg-name">Port B</td><td class="reg-desc"><span class="badge rw">R/W</span> User port I/O.</td></tr>
+        <tr><td class="addr">$DD02/$DD03</td><td class="reg-name">Data Direction A/B</td><td class="reg-desc"><span class="badge rw">R/W</span> Bit direction for ports A and B.</td></tr>
+        <tr><td class="addr">$DD04–$DD0B</td><td class="reg-name">Timers / TOD</td><td class="reg-desc">Same layout as CIA1 timer and TOD registers.</td></tr>
+        <tr><td class="addr">$DD0C</td><td class="reg-name">Serial Data Register</td><td class="reg-desc"><span class="badge rw">R/W</span> Serial shift register.</td></tr>
+        <tr><td class="addr">$DD0D</td><td class="reg-name">NMI Control</td><td class="reg-desc"><span class="badge rw">R/W</span> Like $DC0D but triggers NMI instead of IRQ. Bit 0=Timer A, 1=Timer B, 4=FLAG.</td></tr>
+        <tr><td class="addr">$DD0E/$DD0F</td><td class="reg-name">Control Registers A/B</td><td class="reg-desc"><span class="badge rw">R/W</span> Same layout as CIA1 control registers.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════ U64 TURBO ═══════════════════════════════ -->
+  <section id="turbo">
+    <div class="section-header">
+      <span class="section-tag amber">U64 ONLY</span>
+      <h2>TURBO / CPU SPEED CONTROL</h2>
+      <span class="addr-range">$D030, $D031, $D07A/$D07B, $D0BC</span>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">PREREQUISITE</div>
+      These registers are only active when <strong>Turbo Mode</strong> in the U64 menu is set to <strong>"U64 Turbo Registers"</strong> or <strong>"Turbo Enable Bit"</strong>. In any other mode they read back <code>$FF</code>. Detection: <code>LDA $D031 : CMP #$FF : BEQ not_u64</code>.
+    </div>
+
+    <table class="reg-table">
+      <thead><tr><th>ADDRESS</th><th>REGISTER</th><th>DETAIL</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="addr">$D031</td>
+          <td class="reg-name">U64 Turbo Control</td>
+          <td class="reg-desc">
+            <span class="badge rw">R/W</span>
+            Bits 0–3 = CPU speed index (0–15, see table below).<br>
+            Bit 7 = Badline timing: <code>0</code> = enabled (C64-accurate), <code>1</code> = disabled (more CPU cycles).<br>
+            Active under <em>U64 Turbo Registers</em> or <em>Turbo Enable Bit</em> menu mode.
+          </td>
+        </tr>
+        <tr>
+          <td class="addr">$D030</td>
+          <td class="reg-name">Turbo Enable Bit</td>
+          <td class="reg-desc">
+            <span class="badge rw">R/W</span>
+            Active only under <em>Turbo Enable Bit</em> mode.<br>
+            Write bit 0: <code>0</code> = force 1MHz + badlines, <code>1</code> = use menu speed settings.<br>
+            Read bit 0: <code>0</code> = turbo off, <code>1</code> = turbo on.
+          </td>
+        </tr>
+        <tr>
+          <td class="addr">$D07A</td>
+          <td class="reg-name">SuperCPU Normal Speed</td>
+          <td class="reg-desc"><span class="badge w">W</span> SuperCPU-compatible write-only. Forces CPU to normal (1MHz) speed.</td>
+        </tr>
+        <tr>
+          <td class="addr">$D07B</td>
+          <td class="reg-name">SuperCPU Turbo Speed</td>
+          <td class="reg-desc"><span class="badge w">W</span> SuperCPU-compatible write-only. Forces CPU to turbo (20MHz) speed.</td>
+        </tr>
+        <tr>
+          <td class="addr">$D0BC</td>
+          <td class="reg-name">SuperCPU Detect</td>
+          <td class="reg-desc"><span class="badge r">R</span> Read-only detection register. Requires separate enable in the U64 menu.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn" style="margin-top:16px;">
+      <div class="callout-label">IMPORTANT CAVEAT</div>
+      Disabling badlines via bit 7 of <code>$D031</code> does <strong>not</strong> affect the BA signal on the cartridge port. Accesses to external devices — SID socket chips, cartridge ROM — still cause badline stalls. The setting only applies to internal memory accesses.
+    </div>
+
+    <h2 style="margin-top:20px; font-size:12px; color:var(--phosphor-dim); font-family:'Share Tech Mono',monospace; letter-spacing:0.1em;">CPU SPEED INDEX — $D031 BITS 0–3</h2>
+    <div class="speed-grid" style="margin-top:8px;">
+      <div class="speed-cell"><span class="speed-idx">IDX 0</span><span class="speed-val">1 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 1</span><span class="speed-val">2 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 2</span><span class="speed-val">3 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 3</span><span class="speed-val">4 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 4</span><span class="speed-val">5 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 5</span><span class="speed-val">6 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 6</span><span class="speed-val">8 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 7</span><span class="speed-val">10 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 8</span><span class="speed-val">12 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 9</span><span class="speed-val">14 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 10</span><span class="speed-val">16 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 11</span><span class="speed-val">20 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 12</span><span class="speed-val">24 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 13</span><span class="speed-val">32 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 14</span><span class="speed-val">40 MHz</span></div>
+      <div class="speed-cell"><span class="speed-idx">IDX 15</span><span class="speed-val">48 MHz</span></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════ REU ═══════════════════════════════ -->
+  <section id="reu">
+    <div class="section-header">
+      <span class="section-tag amber">U64 ONLY</span>
+      <h2>RAM EXPANSION UNIT (REU) DMA</h2>
+      <span class="addr-range">$DF00–$DF0A</span>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-label">OVERVIEW</div>
+      The U64's built-in REU is compatible with the original Commodore 1700/1764/1750 register layout, extended with extra address bits for up to 32MB of REU RAM. A single DMA command at <code>$DF01</code> transfers data between REU and C64 RAM invisibly — the CPU does not execute during the transfer. Ideal for streaming large assets that do not fit in the 64K C64 address space.
+    </div>
+
+    <table class="reg-table">
+      <thead><tr><th>ADDRESS</th><th>REGISTER</th><th>NOTES</th></tr></thead>
+      <tbody>
+        <tr><td class="addr">$DF00</td><td class="reg-name">Status Register</td><td class="reg-desc"><span class="badge r">R</span> Bit 7=transfer done. Bit 6=end-of-block. Bit 5=fault. Bit 4=size (1=256 bytes). Cleared on read.</td></tr>
+        <tr><td class="addr">$DF01</td><td class="reg-name">Command Register</td><td class="reg-desc"><span class="badge w">W</span> Bit 7=execute now. Bit 4=FF00 trigger. Bits 0–1=transfer type: <code>00</code>=C64→REU, <code>01</code>=REU→C64, <code>10</code>=swap, <code>11</code>=verify.</td></tr>
+        <tr><td class="addr">$DF02/$DF03</td><td class="reg-name">C64 Base Address</td><td class="reg-desc"><span class="badge rw">R/W</span> 16-bit C64 RAM address (lo/hi). Auto-increments after transfer unless bit 7 of $DF0A set.</td></tr>
+        <tr><td class="addr">$DF04/$DF05/$DF06</td><td class="reg-name">REU Base Address</td><td class="reg-desc"><span class="badge rw">R/W</span> 24-bit REU address (lo/mid/hi). $DF06 high bits extend into multiple megabytes on U64.</td></tr>
+        <tr><td class="addr">$DF07/$DF08</td><td class="reg-name">Transfer Length</td><td class="reg-desc"><span class="badge rw">R/W</span> 16-bit byte count (lo/hi). Value 0 = 65536 bytes.</td></tr>
+        <tr><td class="addr">$DF09</td><td class="reg-name">Interrupt Mask</td><td class="reg-desc"><span class="badge rw">R/W</span> Bit 7=enable interrupt. Bit 6=on end-of-block. Bit 5=on verify fault.</td></tr>
+        <tr><td class="addr">$DF0A</td><td class="reg-name">Address Control</td><td class="reg-desc"><span class="badge rw">R/W</span> Bit 7=fix C64 address. Bit 6=fix REU address. When fixed, address does not auto-increment during transfer.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip" style="margin-top:14px;">
+      <div class="callout-label">PATTERN — STREAM REU → C64</div>
+      <code>STA $DF03 / STA $DF02</code> — set C64 destination.<br>
+      <code>STA $DF06 / STA $DF05 / STA $DF04</code> — set REU source address.<br>
+      <code>STA $DF08 / STA $DF07</code> — set byte count.<br>
+      <code>LDA #$91 : STA $DF01</code> — execute REU→C64 transfer immediately (bit 7=execute, bits 0–1=01).
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════ UCI ═══════════════════════════════ -->
+  <section id="uci">
+    <div class="section-header">
+      <span class="section-tag amber">U64 ONLY</span>
+      <h2>ULTIMATE COMMAND INTERFACE (UCI)</h2>
+      <span class="addr-range">$DF1B–$DF1F</span>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-label">PREREQUISITE</div>
+      The UCI registers must be enabled in the U64 menu under <strong>Command Interface</strong> settings. They occupy the last 5 bytes of the REU address range — enabling UCI masks off those REU registers.
+    </div>
+
+    <table class="reg-table">
+      <thead><tr><th>ADDRESS</th><th>DIR</th><th>REGISTER</th><th>NOTES</th></tr></thead>
+      <tbody>
+        <tr><td class="addr">$DF1B</td><td><span class="badge r">R</span></td><td class="reg-name">SoftwareIEC Bus ID</td><td class="reg-desc">Device ID of the Software IEC virtual drive.</td></tr>
+        <tr><td class="addr">$DF1C</td><td><span class="badge w">W</span></td><td class="reg-name">Control Register</td><td class="reg-desc">Bit 0=<code>PUSH_CMD</code> (fire queued command). Bit 1=<code>DATA_ACC</code> (acknowledge response). Bit 2=<code>ABORT</code>. Bit 3=<code>CLR_ERR</code>. Bit 5=<code>IRQ</code> enable. Bit 6=<code>TRIGGER</code>. Bit 7=<code>DMA</code>.</td></tr>
+        <tr><td class="addr">$DF1C</td><td><span class="badge r">R</span></td><td class="reg-name">Status Register</td><td class="reg-desc">Bit 7=data available. Bit 6=status available. Bits 4–5=protocol state (00=Idle, 01=CmdBusy, 10=DataLast, 11=DataMore). Bit 2=error. Bit 0=cmd busy.</td></tr>
+        <tr><td class="addr">$DF1D</td><td><span class="badge w">W</span></td><td class="reg-name">Command Data Register</td><td class="reg-desc">Write command bytes here before firing <code>PUSH_CMD</code>. First byte is target ID.</td></tr>
+        <tr><td class="addr">$DF1D</td><td><span class="badge r">R</span></td><td class="reg-name">Identification Register</td><td class="reg-desc">Reads <code>$C9</code> at idle. Reads <code>$49</code> when IRQ is active (bit 7 cleared).</td></tr>
+        <tr><td class="addr">$DF1E</td><td><span class="badge r">R</span></td><td class="reg-name">Response Data Queue</td><td class="reg-desc">Read response bytes here when bit 7 of $DF1C status is set.</td></tr>
+        <tr><td class="addr">$DF1F</td><td><span class="badge r">R</span></td><td class="reg-name">Status Data Queue</td><td class="reg-desc">Read command result/status text here when bit 6 of $DF1C status is set.</td></tr>
+      </tbody>
+    </table>
+
+    <h2 style="margin:18px 0 10px; font-size:12px; font-family:'Share Tech Mono',monospace; color:var(--phosphor-dim); letter-spacing:0.1em;">PROTOCOL STATE FLOW</h2>
+    <div class="state-flow">
+      <div class="state-box">IDLE</div>
+      <div class="state-arrow">→ write cmd → PUSH_CMD →</div>
+      <div class="state-box">CMD BUSY</div>
+      <div class="state-arrow">→ Ultimate replies →</div>
+      <div class="state-box">DATA LAST / MORE</div>
+      <div class="state-arrow">→ read + DATA_ACC →</div>
+      <div class="state-box">IDLE</div>
+    </div>
+
+    <h2 style="margin:18px 0 10px; font-size:12px; font-family:'Share Tech Mono',monospace; color:var(--phosphor-dim); letter-spacing:0.1em;">CONTROL TARGET ($04) COMMANDS</h2>
+    <table class="reg-table">
+      <thead><tr><th>COMMAND BYTES</th><th>ACTION</th></tr></thead>
+      <tbody>
+        <tr><td class="addr">$04 $01</td><td class="reg-desc">Identify — returns version string e.g. "CONTROL TARGET V1.1"</td></tr>
+        <tr><td class="addr">$04 $05</td><td class="reg-desc">Freeze — triggers hardware freeze, equivalent to pressing the button</td></tr>
+        <tr><td class="addr">$04 $06</td><td class="reg-desc">Reboot — full C64 reset. No response expected (UCI resets too)</td></tr>
+        <tr><td class="addr">$04 $0F &lt;filename&gt;</td><td class="reg-desc">Save RAM — dumps all 64K C64 RAM to file (default: /temp/c64_memory.bin)</td></tr>
+        <tr><td class="addr">$04 $29</td><td class="reg-desc">Get Drive Info — returns count + [type, IEC address, power state] per drive</td></tr>
+        <tr><td class="addr">$04 $30 / $31</td><td class="reg-desc">Enable / Disable emulated Drive A</td></tr>
+        <tr><td class="addr">$04 $32 / $33</td><td class="reg-desc">Enable / Disable emulated Drive B</td></tr>
+        <tr><td class="addr">$04 $08 / $09 &lt;file&gt;</td><td class="reg-desc">Load / Save REU image to/from SD card storage</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════ NODE IDEAS ═══════════════════════════════ -->
+  <section id="nodes">
+    <div class="section-header">
+      <span class="section-tag green">DEV MACHINE</span>
+      <h2>POTENTIAL MACRO NODES</h2>
+    </div>
+
+    <div class="node-grid">
+      <div class="node-card priority">
+        <div class="node-title">★ MACRO_TURBO</div>
+        <div class="node-desc">Wraps $D031/$D030. Emits a U64 detection probe at init, sets speed index for compute-heavy sections, restores 1MHz before raster IRQ. "Burst compute" pattern.</div>
+        <div class="node-regs">$D031 · $D030 · $D07A · $D07B</div>
+      </div>
+      <div class="node-card priority">
+        <div class="node-title">★ MACRO_REU</div>
+        <div class="node-desc">REU DMA for streaming large data. Double-buffer bitmap frames, pre-build scroll buffers, store multiple music tracks. Invisible to CPU — transfers happen in hardware.</div>
+        <div class="node-regs">$DF00 · $DF01 · $DF02–$DF0A</div>
+      </div>
+      <div class="node-card">
+        <div class="node-title">MACRO_U64_DETECT</div>
+        <div class="node-desc">Simple probe: LDA $D031 / CMP #$FF / BEQ not_u64. Sets a zero-page flag. Other nodes branch on this to conditionally enable U64 features.</div>
+        <div class="node-regs">$D031</div>
+      </div>
+      <div class="node-card">
+        <div class="node-title">MACRO_UCI</div>
+        <div class="node-desc">Lets running demo code trigger system actions: freeze to menu on completion, reboot, save RAM for debug dumps, query/toggle emulated drives.</div>
+        <div class="node-regs">$DF1B · $DF1C · $DF1D · $DF1E · $DF1F</div>
+      </div>
+    </div>
+
+    <div class="callout tip" style="margin-top:18px;">
+      <div class="callout-label">RECOMMENDED PRIORITY</div>
+      <strong>MACRO_TURBO</strong> and <strong>MACRO_REU</strong> are the highest-value additions. Turbo enables fast setup code and complex per-frame computation. REU enables asset streaming beyond the 64K address limit — multiple bitmap pages, multi-track SID data, large map data — without touching C64 RAM layout at all.
+    </div>
+  </section>
+
+  <footer>
+    <div>C64 DEV MACHINE · POLYTRICITY LTD · REGISTER REFERENCE</div>
+    <div style="margin-top:6px; color:var(--phosphor-dim);">
+      Source: 1541u-documentation.readthedocs.io · Lemon64 community · C64 memory map references
+    </div>
+    <div style="margin-top:10px; font-family:'VT323',monospace; font-size:22px; color:var(--phosphor);">
+      READY.<span class="blink">█</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
