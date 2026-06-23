@@ -1,0 +1,3775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C64 Assembly Language Master Test - Part 2</title>
+<style>
+    body {
+        font-family: "Courier New", Courier, monospace;
+        background-color: #1e2227;
+        color: #dcdcdc;
+        margin: 0;
+        padding: 20px;
+    }
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #282c34;
+        padding: 30px;
+        border: 2px solid #61afef;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    }
+    h1 {
+        text-align: center;
+        color: #98c379;
+        text-transform: uppercase;
+        border-bottom: 2px dashed #98c379;
+        padding-bottom: 15px;
+    }
+    .level-header {
+        background: #3e4451;
+        padding: 10px;
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #e5c07b;
+        border-left: 5px solid #e5c07b;
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
+    .question-block {
+        margin-bottom: 25px;
+        background: #31363f;
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px solid #4b5263;
+    }
+    .question-title {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+        color: #61afef;
+    }
+    .options {
+        list-style-type: none;
+        padding: 0;
+    }
+    .options li {
+        margin: 5px 0;
+    }
+    label {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        padding: 8px;
+        background: #3b4048;
+        border: 1px solid #4b5263;
+        border-radius: 3px;
+        transition: background 0.2s;
+    }
+    label:hover {
+        background: #4b5263;
+    }
+    input[type="radio"] {
+        margin-right: 10px;
+        transform: scale(1.2);
+    }
+    button {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        background: #98c379;
+        color: #282c34;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.2em;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 30px;
+        transition: background 0.3s;
+    }
+    button:hover {
+        background: #7cb659;
+    }
+    #results {
+        display: none;
+        margin-top: 30px;
+        padding: 20px;
+        background: #1e3a24;
+        border: 2px solid #98c379;
+        text-align: center;
+        font-size: 1.5em;
+        border-radius: 5px;
+        color: #98c379;
+    }
+    .explanation {
+        margin-top: 10px;
+        font-size: 0.9em;
+        color: #e5c07b;
+        display: none;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>C64 Assembly Language Test - Vol. 2</h1>
+    <p style="text-align:center;">100 ALL NEW Questions: Beginner (1-40) | Intermediate (41-65) | Advanced (66-85) | Expert (86-100)</p>
+    
+    <form id="quizForm">
+<div class="level-header">Beginner (Questions 1 - 40)</div>
+
+        <div class="question-block" id="qblock_0">
+            <div class="question-title">Q1. What does the NOP instruction do?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q0" value="Normalizes internal Pointers" data-correct="Nothing (No Operation)">
+                        Normalizes internal Pointers
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q0" value="Negates the Accumulator" data-correct="Nothing (No Operation)">
+                        Negates the Accumulator
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q0" value="Next Operation Page" data-correct="Nothing (No Operation)">
+                        Next Operation Page
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q0" value="Nothing (No Operation)" data-correct="Nothing (No Operation)">
+                        Nothing (No Operation)
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q0">Correct Answer: Nothing (No Operation)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_1">
+            <div class="question-title">Q2. Which register is 16-bits wide in the 6510 CPU?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q1" value="Index Register (X)" data-correct="Program Counter (PC)">
+                        Index Register (X)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q1" value="Stack Pointer (SP)" data-correct="Program Counter (PC)">
+                        Stack Pointer (SP)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q1" value="Program Counter (PC)" data-correct="Program Counter (PC)">
+                        Program Counter (PC)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q1" value="Accumulator (A)" data-correct="Program Counter (PC)">
+                        Accumulator (A)
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q1">Correct Answer: Program Counter (PC)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_2">
+            <div class="question-title">Q3. How wide is the Stack Pointer (SP) on the 6502/6510?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q2" value="16 bits" data-correct="8 bits">
+                        16 bits
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q2" value="32 bits" data-correct="8 bits">
+                        32 bits
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q2" value="4 bits" data-correct="8 bits">
+                        4 bits
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q2" value="8 bits" data-correct="8 bits">
+                        8 bits
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q2">Correct Answer: 8 bits</div>
+        </div>
+    
+        <div class="question-block" id="qblock_3">
+            <div class="question-title">Q4. What is the total addressable memory space of the standard C64?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q3" value="32 KB (32768 bytes)" data-correct="64 KB (65536 bytes)">
+                        32 KB (32768 bytes)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q3" value="128 KB" data-correct="64 KB (65536 bytes)">
+                        128 KB
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q3" value="64 KB (65536 bytes)" data-correct="64 KB (65536 bytes)">
+                        64 KB (65536 bytes)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q3" value="1024 KB" data-correct="64 KB (65536 bytes)">
+                        1024 KB
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q3">Correct Answer: 64 KB (65536 bytes)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_4">
+            <div class="question-title">Q5. Which condition triggers a BMI instruction?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q4" value="Zero flag is set" data-correct="Negative flag is set">
+                        Zero flag is set
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q4" value="Carry flag is clear" data-correct="Negative flag is set">
+                        Carry flag is clear
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q4" value="Negative flag is clear" data-correct="Negative flag is set">
+                        Negative flag is clear
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q4" value="Negative flag is set" data-correct="Negative flag is set">
+                        Negative flag is set
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q4">Correct Answer: Negative flag is set</div>
+        </div>
+    
+        <div class="question-block" id="qblock_5">
+            <div class="question-title">Q6. Which condition triggers a BPL instruction?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q5" value="Overflow flag is set" data-correct="Negative flag is clear">
+                        Overflow flag is set
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q5" value="Negative flag is set" data-correct="Negative flag is clear">
+                        Negative flag is set
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q5" value="Zero flag is clear" data-correct="Negative flag is clear">
+                        Zero flag is clear
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q5" value="Negative flag is clear" data-correct="Negative flag is clear">
+                        Negative flag is clear
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q5">Correct Answer: Negative flag is clear</div>
+        </div>
+    
+        <div class="question-block" id="qblock_6">
+            <div class="question-title">Q7. Which condition triggers a BCS instruction?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q6" value="Zero flag is set" data-correct="Carry flag is set">
+                        Zero flag is set
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q6" value="Carry flag is clear" data-correct="Carry flag is set">
+                        Carry flag is clear
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q6" value="Carry flag is set" data-correct="Carry flag is set">
+                        Carry flag is set
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q6" value="Overflow flag is clear" data-correct="Carry flag is set">
+                        Overflow flag is clear
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q6">Correct Answer: Carry flag is set</div>
+        </div>
+    
+        <div class="question-block" id="qblock_7">
+            <div class="question-title">Q8. Which condition triggers a BCC instruction?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q7" value="Carry flag is set" data-correct="Carry flag is clear">
+                        Carry flag is set
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q7" value="Negative flag is clear" data-correct="Carry flag is clear">
+                        Negative flag is clear
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q7" value="Carry flag is clear" data-correct="Carry flag is clear">
+                        Carry flag is clear
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q7" value="Zero flag is clear" data-correct="Carry flag is clear">
+                        Zero flag is clear
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q7">Correct Answer: Carry flag is clear</div>
+        </div>
+    
+        <div class="question-block" id="qblock_8">
+            <div class="question-title">Q9. What does the CLV instruction do?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q8" value="Clears the Overflow flag" data-correct="Clears the Overflow flag">
+                        Clears the Overflow flag
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q8" value="Clears the VIC-II chip" data-correct="Clears the Overflow flag">
+                        Clears the VIC-II chip
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q8" value="Clears the Variables" data-correct="Clears the Overflow flag">
+                        Clears the Variables
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q8" value="Compares logical values" data-correct="Clears the Overflow flag">
+                        Compares logical values
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q8">Correct Answer: Clears the Overflow flag</div>
+        </div>
+    
+        <div class="question-block" id="qblock_9">
+            <div class="question-title">Q10. What does RTI stand for?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q9" value="Rotate To Invert" data-correct="Return from Interrupt">
+                        Rotate To Invert
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q9" value="Run To Instruction" data-correct="Return from Interrupt">
+                        Run To Instruction
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q9" value="Return from Interrupt" data-correct="Return from Interrupt">
+                        Return from Interrupt
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q9" value="Return to Index" data-correct="Return from Interrupt">
+                        Return to Index
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q9">Correct Answer: Return from Interrupt</div>
+        </div>
+    
+        <div class="question-block" id="qblock_10">
+            <div class="question-title">Q11. What does RTS stand for?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q10" value="Read To Stack" data-correct="Return from Subroutine">
+                        Read To Stack
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q10" value="Reset Timer Status" data-correct="Return from Subroutine">
+                        Reset Timer Status
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q10" value="Return To Start" data-correct="Return from Subroutine">
+                        Return To Start
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q10" value="Return from Subroutine" data-correct="Return from Subroutine">
+                        Return from Subroutine
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q10">Correct Answer: Return from Subroutine</div>
+        </div>
+    
+        <div class="question-block" id="qblock_11">
+            <div class="question-title">Q12. What is the hexadecimal opcode byte for a BRK instruction?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q11" value="$20" data-correct="$00">
+                        $20
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q11" value="$EA" data-correct="$00">
+                        $EA
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q11" value="$FF" data-correct="$00">
+                        $FF
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q11" value="$00" data-correct="$00">
+                        $00
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q11">Correct Answer: $00</div>
+        </div>
+    
+        <div class="question-block" id="qblock_12">
+            <div class="question-title">Q13. What is the hexadecimal opcode byte for a NOP instruction?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q12" value="$A9" data-correct="$EA">
+                        $A9
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q12" value="$00" data-correct="$EA">
+                        $00
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q12" value="$EA" data-correct="$EA">
+                        $EA
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q12" value="$FF" data-correct="$EA">
+                        $FF
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q12">Correct Answer: $EA</div>
+        </div>
+    
+        <div class="question-block" id="qblock_13">
+            <div class="question-title">Q14. What does ADC stand for?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q13" value="Absolute Data Comparison" data-correct="Add with Carry">
+                        Absolute Data Comparison
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q13" value="Address Code" data-correct="Add with Carry">
+                        Address Code
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q13" value="Add Decimal Constant" data-correct="Add with Carry">
+                        Add Decimal Constant
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q13" value="Add with Carry" data-correct="Add with Carry">
+                        Add with Carry
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q13">Correct Answer: Add with Carry</div>
+        </div>
+    
+        <div class="question-block" id="qblock_14">
+            <div class="question-title">Q15. What does SBC stand for?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q14" value="Subtract with Carry" data-correct="Subtract with Carry">
+                        Subtract with Carry
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q14" value="Set Bit Clear" data-correct="Subtract with Carry">
+                        Set Bit Clear
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q14" value="Store Byte Code" data-correct="Subtract with Carry">
+                        Store Byte Code
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q14" value="Subtract Binary Constant" data-correct="Subtract with Carry">
+                        Subtract Binary Constant
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q14">Correct Answer: Subtract with Carry</div>
+        </div>
+    
+        <div class="question-block" id="qblock_15">
+            <div class="question-title">Q16. To perform an independent subtraction (SBC) accurately, what must you do first?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q15" value="Set the Overflow flag" data-correct="Set the Carry flag (SEC)">
+                        Set the Overflow flag
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q15" value="Set the Carry flag (SEC)" data-correct="Set the Carry flag (SEC)">
+                        Set the Carry flag (SEC)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q15" value="Clear the Zero flag" data-correct="Set the Carry flag (SEC)">
+                        Clear the Zero flag
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q15" value="Clear the Carry flag (CLC)" data-correct="Set the Carry flag (SEC)">
+                        Clear the Carry flag (CLC)
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q15">Correct Answer: Set the Carry flag (SEC)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_16">
+            <div class="question-title">Q17. What addressing mode is used in `JMP ($1000)`?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q16" value="Zero Page Indirect" data-correct="Absolute Indirect">
+                        Zero Page Indirect
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q16" value="Immediate" data-correct="Absolute Indirect">
+                        Immediate
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q16" value="Indexed Indirect" data-correct="Absolute Indirect">
+                        Indexed Indirect
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q16" value="Absolute Indirect" data-correct="Absolute Indirect">
+                        Absolute Indirect
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q16">Correct Answer: Absolute Indirect</div>
+        </div>
+    
+        <div class="question-block" id="qblock_17">
+            <div class="question-title">Q18. Can the JSR (Jump to Subroutine) instruction use indirect addressing natively?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q17" value="Yes, it supports all addressing modes" data-correct="No, only Absolute addressing">
+                        Yes, it supports all addressing modes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q17" value="Yes, with the Y register" data-correct="No, only Absolute addressing">
+                        Yes, with the Y register
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q17" value="No, only Absolute addressing" data-correct="No, only Absolute addressing">
+                        No, only Absolute addressing
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q17" value="Yes, but only in Zero Page" data-correct="No, only Absolute addressing">
+                        Yes, but only in Zero Page
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q17">Correct Answer: No, only Absolute addressing</div>
+        </div>
+    
+        <div class="question-block" id="qblock_18">
+            <div class="question-title">Q19. What happens if you increment the X register (INX) when it holds the value $FF?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q18" value="It becomes $0100" data-correct="It wraps around to $00">
+                        It becomes $0100
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q18" value="It crashes the CPU" data-correct="It wraps around to $00">
+                        It crashes the CPU
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q18" value="It triggers an Overflow flag" data-correct="It wraps around to $00">
+                        It triggers an Overflow flag
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q18" value="It wraps around to $00" data-correct="It wraps around to $00">
+                        It wraps around to $00
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q18">Correct Answer: It wraps around to $00</div>
+        </div>
+    
+        <div class="question-block" id="qblock_19">
+            <div class="question-title">Q20. What is the standard hexadecimal value for the character 'Space' in PETSCII?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q19" value="$20" data-correct="$20">
+                        $20
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q19" value="$00" data-correct="$20">
+                        $00
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q19" value="$40" data-correct="$20">
+                        $40
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q19" value="$FF" data-correct="$20">
+                        $FF
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q19">Correct Answer: $20</div>
+        </div>
+    
+        <div class="question-block" id="qblock_20">
+            <div class="question-title">Q21. What does the instruction TAY do?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q20" value="Copies the Accumulator to the Y register" data-correct="Copies the Accumulator to the Y register">
+                        Copies the Accumulator to the Y register
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q20" value="Tests the A and Y registers" data-correct="Copies the Accumulator to the Y register">
+                        Tests the A and Y registers
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q20" value="Toggles the Y register" data-correct="Copies the Accumulator to the Y register">
+                        Toggles the Y register
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q20" value="Transfers A to X" data-correct="Copies the Accumulator to the Y register">
+                        Transfers A to X
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q20">Correct Answer: Copies the Accumulator to the Y register</div>
+        </div>
+    
+        <div class="question-block" id="qblock_21">
+            <div class="question-title">Q22. Which two status flags are automatically updated by TAY, TAX, INX, and DEY?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q21" value="Zero and Negative flags" data-correct="Zero and Negative flags">
+                        Zero and Negative flags
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q21" value="Carry and Negative flags" data-correct="Zero and Negative flags">
+                        Carry and Negative flags
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q21" value="Overflow and Decimal flags" data-correct="Zero and Negative flags">
+                        Overflow and Decimal flags
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q21" value="Carry and Zero flags" data-correct="Zero and Negative flags">
+                        Carry and Zero flags
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q21">Correct Answer: Zero and Negative flags</div>
+        </div>
+    
+        <div class="question-block" id="qblock_22">
+            <div class="question-title">Q23. Which bit in an 8-bit byte represents the Sign (Negative) bit in two's complement?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q22" value="Bit 0" data-correct="Bit 7">
+                        Bit 0
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q22" value="Bit 4" data-correct="Bit 7">
+                        Bit 4
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q22" value="Bit 8" data-correct="Bit 7">
+                        Bit 8
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q22" value="Bit 7" data-correct="Bit 7">
+                        Bit 7
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q22">Correct Answer: Bit 7</div>
+        </div>
+    
+        <div class="question-block" id="qblock_23">
+            <div class="question-title">Q24. What decimal value does the hexadecimal number $FF represent?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q23" value="128" data-correct="255">
+                        128
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q23" value="16" data-correct="255">
+                        16
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q23" value="255" data-correct="255">
+                        255
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q23" value="256" data-correct="255">
+                        256
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q23">Correct Answer: 255</div>
+        </div>
+    
+        <div class="question-block" id="qblock_24">
+            <div class="question-title">Q25. What hexadecimal value does the binary number %10101010 represent?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q24" value="$F0" data-correct="$AA">
+                        $F0
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q24" value="$AA" data-correct="$AA">
+                        $AA
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q24" value="$55" data-correct="$AA">
+                        $55
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q24" value="$0F" data-correct="$AA">
+                        $0F
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q24">Correct Answer: $AA</div>
+        </div>
+    
+        <div class="question-block" id="qblock_25">
+            <div class="question-title">Q26. In the standard C64 memory map, what resides between $D000 and $DFFF?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q25" value="Zero Page" data-correct="Hardware I/O Registers (VIC, SID, CIA)">
+                        Zero Page
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q25" value="Screen RAM" data-correct="Hardware I/O Registers (VIC, SID, CIA)">
+                        Screen RAM
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q25" value="Hardware I/O Registers (VIC, SID, CIA)" data-correct="Hardware I/O Registers (VIC, SID, CIA)">
+                        Hardware I/O Registers (VIC, SID, CIA)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q25" value="BASIC ROM" data-correct="Hardware I/O Registers (VIC, SID, CIA)">
+                        BASIC ROM
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q25">Correct Answer: Hardware I/O Registers (VIC, SID, CIA)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_26">
+            <div class="question-title">Q27. How large is the standard C64 Color RAM?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q26" value="4096 bytes (4 KB)" data-correct="1000 bytes (1 KB)">
+                        4096 bytes (4 KB)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q26" value="256 bytes" data-correct="1000 bytes (1 KB)">
+                        256 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q26" value="2000 bytes" data-correct="1000 bytes (1 KB)">
+                        2000 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q26" value="1000 bytes (1 KB)" data-correct="1000 bytes (1 KB)">
+                        1000 bytes (1 KB)
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q26">Correct Answer: 1000 bytes (1 KB)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_27">
+            <div class="question-title">Q28. How many columns and rows make up the standard C64 text screen?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q27" value="32 columns, 24 rows" data-correct="40 columns, 25 rows">
+                        32 columns, 24 rows
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q27" value="40 columns, 24 rows" data-correct="40 columns, 25 rows">
+                        40 columns, 24 rows
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q27" value="40 columns, 25 rows" data-correct="40 columns, 25 rows">
+                        40 columns, 25 rows
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q27" value="80 columns, 25 rows" data-correct="40 columns, 25 rows">
+                        80 columns, 25 rows
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q27">Correct Answer: 40 columns, 25 rows</div>
+        </div>
+    
+        <div class="question-block" id="qblock_28">
+            <div class="question-title">Q29. What is the default background color of the C64 screen on boot?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q28" value="White (Color 1)" data-correct="Blue (Color 6)">
+                        White (Color 1)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q28" value="Light Blue (Color 14)" data-correct="Blue (Color 6)">
+                        Light Blue (Color 14)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q28" value="Blue (Color 6)" data-correct="Blue (Color 6)">
+                        Blue (Color 6)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q28" value="Black (Color 0)" data-correct="Blue (Color 6)">
+                        Black (Color 0)
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q28">Correct Answer: Blue (Color 6)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_29">
+            <div class="question-title">Q30. What is the default border color of the C64 screen on boot?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q29" value="Light Blue (Color 14)" data-correct="Light Blue (Color 14)">
+                        Light Blue (Color 14)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q29" value="Blue (Color 6)" data-correct="Light Blue (Color 14)">
+                        Blue (Color 6)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q29" value="Black (Color 0)" data-correct="Light Blue (Color 14)">
+                        Black (Color 0)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q29" value="Cyan (Color 3)" data-correct="Light Blue (Color 14)">
+                        Cyan (Color 3)
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q29">Correct Answer: Light Blue (Color 14)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_30">
+            <div class="question-title">Q31. What memory address initiates the software reset sequence when called (SYS 64738)?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q30" value="$FFD2" data-correct="$FCE2">
+                        $FFD2
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q30" value="$FCE2" data-correct="$FCE2">
+                        $FCE2
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q30" value="$0801" data-correct="$FCE2">
+                        $0801
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q30" value="$E544" data-correct="$FCE2">
+                        $E544
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q30">Correct Answer: $FCE2</div>
+        </div>
+    
+        <div class="question-block" id="qblock_31">
+            <div class="question-title">Q32. How many clock cycles does a standard NOP instruction take to execute?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q31" value="2 cycles" data-correct="2 cycles">
+                        2 cycles
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q31" value="4 cycles" data-correct="2 cycles">
+                        4 cycles
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q31" value="3 cycles" data-correct="2 cycles">
+                        3 cycles
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q31" value="1 cycle" data-correct="2 cycles">
+                        1 cycle
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q31">Correct Answer: 2 cycles</div>
+        </div>
+    
+        <div class="question-block" id="qblock_32">
+            <div class="question-title">Q33. Which instruction sets the Decimal mode flag?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q32" value="SED" data-correct="SED">
+                        SED
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q32" value="SEC" data-correct="SED">
+                        SEC
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q32" value="SEI" data-correct="SED">
+                        SEI
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q32" value="CLD" data-correct="SED">
+                        CLD
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q32">Correct Answer: SED</div>
+        </div>
+    
+        <div class="question-block" id="qblock_33">
+            <div class="question-title">Q34. Which register determines the exact memory location for a Zero Page instruction like `LDA $10`?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q33" value="The X register" data-correct="The instruction itself explicitly dictates it">
+                        The X register
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q33" value="The Program Counter" data-correct="The instruction itself explicitly dictates it">
+                        The Program Counter
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q33" value="The instruction itself explicitly dictates it" data-correct="The instruction itself explicitly dictates it">
+                        The instruction itself explicitly dictates it
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q33" value="The Stack Pointer" data-correct="The instruction itself explicitly dictates it">
+                        The Stack Pointer
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q33">Correct Answer: The instruction itself explicitly dictates it</div>
+        </div>
+    
+        <div class="question-block" id="qblock_34">
+            <div class="question-title">Q35. What does the instruction `PHA` push onto the stack?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q34" value="The Processor Status Register" data-correct="The Accumulator">
+                        The Processor Status Register
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q34" value="The X register" data-correct="The Accumulator">
+                        The X register
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q34" value="The Accumulator" data-correct="The Accumulator">
+                        The Accumulator
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q34" value="The Program Counter" data-correct="The Accumulator">
+                        The Program Counter
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q34">Correct Answer: The Accumulator</div>
+        </div>
+    
+        <div class="question-block" id="qblock_35">
+            <div class="question-title">Q36. What is the correct syntax to load the Accumulator with the binary value %00001111?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q35" value="LDA $0F" data-correct="LDA #%00001111">
+                        LDA $0F
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q35" value="LDA 15" data-correct="LDA #%00001111">
+                        LDA 15
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q35" value="LDA #$00001111" data-correct="LDA #%00001111">
+                        LDA #$00001111
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q35" value="LDA #%00001111" data-correct="LDA #%00001111">
+                        LDA #%00001111
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q35">Correct Answer: LDA #%00001111</div>
+        </div>
+    
+        <div class="question-block" id="qblock_36">
+            <div class="question-title">Q37. Which instruction branch relies on the Overflow flag being set?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q36" value="BVC" data-correct="BVS">
+                        BVC
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q36" value="BVS" data-correct="BVS">
+                        BVS
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q36" value="BNE" data-correct="BVS">
+                        BNE
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q36" value="BMI" data-correct="BVS">
+                        BMI
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q36">Correct Answer: BVS</div>
+        </div>
+    
+        <div class="question-block" id="qblock_37">
+            <div class="question-title">Q38. Which instruction branch relies on the Overflow flag being clear?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q37" value="BVC" data-correct="BVC">
+                        BVC
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q37" value="BCC" data-correct="BVC">
+                        BCC
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q37" value="BVS" data-correct="BVC">
+                        BVS
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q37" value="BPL" data-correct="BVC">
+                        BPL
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q37">Correct Answer: BVC</div>
+        </div>
+    
+        <div class="question-block" id="qblock_38">
+            <div class="question-title">Q39. If the Carry flag is clear, what will `BCC $10` do?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q38" value="Do nothing and continue to the next instruction" data-correct="Branch forward to the specified label/address">
+                        Do nothing and continue to the next instruction
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q38" value="Branch forward to the specified label/address" data-correct="Branch forward to the specified label/address">
+                        Branch forward to the specified label/address
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q38" value="Crash the CPU" data-correct="Branch forward to the specified label/address">
+                        Crash the CPU
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q38" value="Branch backward infinitely" data-correct="Branch forward to the specified label/address">
+                        Branch backward infinitely
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q38">Correct Answer: Branch forward to the specified label/address</div>
+        </div>
+    
+        <div class="question-block" id="qblock_39">
+            <div class="question-title">Q40. What does the `CPX #$05` instruction do?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q39" value="Clears the 5th bit of X" data-correct="Compares the X register to the literal value 5">
+                        Clears the 5th bit of X
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q39" value="Compares memory address $05 to X" data-correct="Compares the X register to the literal value 5">
+                        Compares memory address $05 to X
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q39" value="Copies 5 into X" data-correct="Compares the X register to the literal value 5">
+                        Copies 5 into X
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q39" value="Compares the X register to the literal value 5" data-correct="Compares the X register to the literal value 5">
+                        Compares the X register to the literal value 5
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q39">Correct Answer: Compares the X register to the literal value 5</div>
+        </div>
+    <div class="level-header">Intermediate (Questions 41 - 65)</div>
+
+        <div class="question-block" id="qblock_40">
+            <div class="question-title">Q41. What Kernal ROM routine saves memory to a device (like a disk drive)?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q40" value="OPEN ($FFC0)" data-correct="SAVE ($FFD8)">
+                        OPEN ($FFC0)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q40" value="LOAD ($FFD5)" data-correct="SAVE ($FFD8)">
+                        LOAD ($FFD5)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q40" value="SAVE ($FFD8)" data-correct="SAVE ($FFD8)">
+                        SAVE ($FFD8)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q40" value="BSOUT ($FFD2)" data-correct="SAVE ($FFD8)">
+                        BSOUT ($FFD2)
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q40">Correct Answer: SAVE ($FFD8)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_41">
+            <div class="question-title">Q42. What Kernal ROM routine restores the default system I/O vectors?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q41" value="IOBASE ($FFF3)" data-correct="RESTOR ($FF8A)">
+                        IOBASE ($FFF3)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q41" value="VECTOR ($FF8D)" data-correct="RESTOR ($FF8A)">
+                        VECTOR ($FF8D)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q41" value="RESTOR ($FF8A)" data-correct="RESTOR ($FF8A)">
+                        RESTOR ($FF8A)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q41" value="SCNKEY ($FF9F)" data-correct="RESTOR ($FF8A)">
+                        SCNKEY ($FF9F)
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q41">Correct Answer: RESTOR ($FF8A)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_42">
+            <div class="question-title">Q43. What does the instruction `BIT $D011` do to the Negative flag?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q42" value="Sets it to match the Zero flag" data-correct="Sets it to match bit 7 of the value at $D011">
+                        Sets it to match the Zero flag
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q42" value="Always clears it" data-correct="Sets it to match bit 7 of the value at $D011">
+                        Always clears it
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q42" value="Inverts it" data-correct="Sets it to match bit 7 of the value at $D011">
+                        Inverts it
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q42" value="Sets it to match bit 7 of the value at $D011" data-correct="Sets it to match bit 7 of the value at $D011">
+                        Sets it to match bit 7 of the value at $D011
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q42">Correct Answer: Sets it to match bit 7 of the value at $D011</div>
+        </div>
+    
+        <div class="question-block" id="qblock_43">
+            <div class="question-title">Q44. Which index register must be used with the `LDA (zp,X)` addressing mode?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q43" value="Stack Pointer" data-correct="X register">
+                        Stack Pointer
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q43" value="X register" data-correct="X register">
+                        X register
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q43" value="Accumulator" data-correct="X register">
+                        Accumulator
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q43" value="Y register" data-correct="X register">
+                        Y register
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q43">Correct Answer: X register</div>
+        </div>
+    
+        <div class="question-block" id="qblock_44">
+            <div class="question-title">Q45. Which index register must be used with the `LDA (zp),Y` addressing mode?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q44" value="X register" data-correct="Y register">
+                        X register
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q44" value="Y register" data-correct="Y register">
+                        Y register
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q44" value="Stack Pointer" data-correct="Y register">
+                        Stack Pointer
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q44" value="Accumulator" data-correct="Y register">
+                        Accumulator
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q44">Correct Answer: Y register</div>
+        </div>
+    
+        <div class="question-block" id="qblock_45">
+            <div class="question-title">Q46. Can you push the X register directly to the stack with a single 6502 instruction?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q45" value="Yes, using STX" data-correct="No, you must transfer it to A first (TXA, PHA)">
+                        Yes, using STX
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q45" value="No, you must transfer it to A first (TXA, PHA)" data-correct="No, you must transfer it to A first (TXA, PHA)">
+                        No, you must transfer it to A first (TXA, PHA)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q45" value="No, X cannot be saved to the stack" data-correct="No, you must transfer it to A first (TXA, PHA)">
+                        No, X cannot be saved to the stack
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q45" value="Yes, using PHX" data-correct="No, you must transfer it to A first (TXA, PHA)">
+                        Yes, using PHX
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q45">Correct Answer: No, you must transfer it to A first (TXA, PHA)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_46">
+            <div class="question-title">Q47. What address holds the physical top of the 6502 hardware stack (the first byte pushed)?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q46" value="$0200" data-correct="$01FF">
+                        $0200
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q46" value="$0100" data-correct="$01FF">
+                        $0100
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q46" value="$00FF" data-correct="$01FF">
+                        $00FF
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q46" value="$01FF" data-correct="$01FF">
+                        $01FF
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q46">Correct Answer: $01FF</div>
+        </div>
+    
+        <div class="question-block" id="qblock_47">
+            <div class="question-title">Q48. What is the maximum distance a relative branch instruction (like BNE) can jump backward?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q47" value="255 bytes" data-correct="128 bytes">
+                        255 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q47" value="256 bytes" data-correct="128 bytes">
+                        256 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q47" value="128 bytes" data-correct="128 bytes">
+                        128 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q47" value="64 bytes" data-correct="128 bytes">
+                        64 bytes
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q47">Correct Answer: 128 bytes</div>
+        </div>
+    
+        <div class="question-block" id="qblock_48">
+            <div class="question-title">Q49. What is the maximum distance a relative branch instruction can jump forward?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q48" value="128 bytes" data-correct="127 bytes">
+                        128 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q48" value="127 bytes" data-correct="127 bytes">
+                        127 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q48" value="256 bytes" data-correct="127 bytes">
+                        256 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q48" value="255 bytes" data-correct="127 bytes">
+                        255 bytes
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q48">Correct Answer: 127 bytes</div>
+        </div>
+    
+        <div class="question-block" id="qblock_49">
+            <div class="question-title">Q50. How many bytes of memory does the instruction `LDA #$00` consume?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q49" value="3 bytes" data-correct="2 bytes">
+                        3 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q49" value="1 byte" data-correct="2 bytes">
+                        1 byte
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q49" value="4 bytes" data-correct="2 bytes">
+                        4 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q49" value="2 bytes" data-correct="2 bytes">
+                        2 bytes
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q49">Correct Answer: 2 bytes</div>
+        </div>
+    
+        <div class="question-block" id="qblock_50">
+            <div class="question-title">Q51. How many bytes of memory does the instruction `LDA $1234` consume?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q50" value="4 bytes" data-correct="3 bytes">
+                        4 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q50" value="2 bytes" data-correct="3 bytes">
+                        2 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q50" value="1 byte" data-correct="3 bytes">
+                        1 byte
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q50" value="3 bytes" data-correct="3 bytes">
+                        3 bytes
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q50">Correct Answer: 3 bytes</div>
+        </div>
+    
+        <div class="question-block" id="qblock_51">
+            <div class="question-title">Q52. How many bytes of memory does the instruction `TAX` consume?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q51" value="2 bytes" data-correct="1 byte">
+                        2 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q51" value="0 bytes" data-correct="1 byte">
+                        0 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q51" value="3 bytes" data-correct="1 byte">
+                        3 bytes
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q51" value="1 byte" data-correct="1 byte">
+                        1 byte
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q51">Correct Answer: 1 byte</div>
+        </div>
+    
+        <div class="question-block" id="qblock_52">
+            <div class="question-title">Q53. In what direction does the 6502 stack grow when items are pushed?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q52" value="Downwards (from $01FF towards $0100)" data-correct="Downwards (from $01FF towards $0100)">
+                        Downwards (from $01FF towards $0100)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q52" value="Randomly" data-correct="Downwards (from $01FF towards $0100)">
+                        Randomly
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q52" value="Left to Right" data-correct="Downwards (from $01FF towards $0100)">
+                        Left to Right
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q52" value="Upwards (from $0100 towards $01FF)" data-correct="Downwards (from $01FF towards $0100)">
+                        Upwards (from $0100 towards $01FF)
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q52">Correct Answer: Downwards (from $01FF towards $0100)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_53">
+            <div class="question-title">Q54. What happens to the Stack Pointer register when you push a byte onto the stack?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q53" value="It decrements by 1" data-correct="It decrements by 1">
+                        It decrements by 1
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q53" value="It stays the same" data-correct="It decrements by 1">
+                        It stays the same
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q53" value="It wraps to $FF" data-correct="It decrements by 1">
+                        It wraps to $FF
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q53" value="It increments by 1" data-correct="It decrements by 1">
+                        It increments by 1
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q53">Correct Answer: It decrements by 1</div>
+        </div>
+    
+        <div class="question-block" id="qblock_54">
+            <div class="question-title">Q55. Which hardware chip does CIA 1 ($DC00) interface with by default?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q54" value="Video Output" data-correct="Keyboard and Joysticks">
+                        Video Output
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q54" value="Keyboard and Joysticks" data-correct="Keyboard and Joysticks">
+                        Keyboard and Joysticks
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q54" value="NMI interrupts" data-correct="Keyboard and Joysticks">
+                        NMI interrupts
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q54" value="Serial Bus (Disk Drive)" data-correct="Keyboard and Joysticks">
+                        Serial Bus (Disk Drive)
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q54">Correct Answer: Keyboard and Joysticks</div>
+        </div>
+    
+        <div class="question-block" id="qblock_55">
+            <div class="question-title">Q56. Which hardware chip does CIA 2 ($DD00) interface with by default?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q55" value="Serial Bus (Disk Drive) and User Port" data-correct="Serial Bus (Disk Drive) and User Port">
+                        Serial Bus (Disk Drive) and User Port
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q55" value="SID Volume" data-correct="Serial Bus (Disk Drive) and User Port">
+                        SID Volume
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q55" value="Keyboard matrix" data-correct="Serial Bus (Disk Drive) and User Port">
+                        Keyboard matrix
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q55" value="Joysticks 1 and 2" data-correct="Serial Bus (Disk Drive) and User Port">
+                        Joysticks 1 and 2
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q55">Correct Answer: Serial Bus (Disk Drive) and User Port</div>
+        </div>
+    
+        <div class="question-block" id="qblock_56">
+            <div class="question-title">Q57. What register sets the data direction for CIA 1 Port A?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q56" value="$DC02" data-correct="$DC02">
+                        $DC02
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q56" value="$DC00" data-correct="$DC02">
+                        $DC00
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q56" value="$DD02" data-correct="$DC02">
+                        $DD02
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q56" value="$D400" data-correct="$DC02">
+                        $D400
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q56">Correct Answer: $DC02</div>
+        </div>
+    
+        <div class="question-block" id="qblock_57">
+            <div class="question-title">Q58. Keyboard matrix scanning relies on which CIA ports?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q57" value="CIA 2 Port A and Port B" data-correct="CIA 1 Port A and Port B">
+                        CIA 2 Port A and Port B
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q57" value="CIA 1 Port A and CIA 2 Port A" data-correct="CIA 1 Port A and Port B">
+                        CIA 1 Port A and CIA 2 Port A
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q57" value="SID paddle inputs" data-correct="CIA 1 Port A and Port B">
+                        SID paddle inputs
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q57" value="CIA 1 Port A and Port B" data-correct="CIA 1 Port A and Port B">
+                        CIA 1 Port A and Port B
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q57">Correct Answer: CIA 1 Port A and Port B</div>
+        </div>
+    
+        <div class="question-block" id="qblock_58">
+            <div class="question-title">Q59. Which type of hardware interrupt cannot be masked or disabled by the `SEI` instruction?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q58" value="BRK (Software Break)" data-correct="NMI (Non-Maskable Interrupt)">
+                        BRK (Software Break)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q58" value="Reset" data-correct="NMI (Non-Maskable Interrupt)">
+                        Reset
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q58" value="IRQ (Interrupt Request)" data-correct="NMI (Non-Maskable Interrupt)">
+                        IRQ (Interrupt Request)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q58" value="NMI (Non-Maskable Interrupt)" data-correct="NMI (Non-Maskable Interrupt)">
+                        NMI (Non-Maskable Interrupt)
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q58">Correct Answer: NMI (Non-Maskable Interrupt)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_59">
+            <div class="question-title">Q60. What value is typically loaded into the Accumulator when you read `LDA $01` on a standard C64 boot?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q59" value="$08" data-correct="$37">
+                        $08
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q59" value="$37" data-correct="$37">
+                        $37
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q59" value="$FF" data-correct="$37">
+                        $FF
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q59" value="$00" data-correct="$37">
+                        $00
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q59">Correct Answer: $37</div>
+        </div>
+    
+        <div class="question-block" id="qblock_60">
+            <div class="question-title">Q61. The instruction `ASL A` shifts bits left. Where does the original bit 7 end up?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q60" value="In the Zero Flag" data-correct="In the Carry Flag">
+                        In the Zero Flag
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q60" value="It is discarded" data-correct="In the Carry Flag">
+                        It is discarded
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q60" value="It wraps around to bit 0" data-correct="In the Carry Flag">
+                        It wraps around to bit 0
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q60" value="In the Carry Flag" data-correct="In the Carry Flag">
+                        In the Carry Flag
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q60">Correct Answer: In the Carry Flag</div>
+        </div>
+    
+        <div class="question-block" id="qblock_61">
+            <div class="question-title">Q62. The instruction `LSR A` shifts bits right. Where does the original bit 0 end up?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q61" value="It is discarded" data-correct="In the Carry Flag">
+                        It is discarded
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q61" value="It wraps around to bit 7" data-correct="In the Carry Flag">
+                        It wraps around to bit 7
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q61" value="In the Carry Flag" data-correct="In the Carry Flag">
+                        In the Carry Flag
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q61" value="In the Negative Flag" data-correct="In the Carry Flag">
+                        In the Negative Flag
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q61">Correct Answer: In the Carry Flag</div>
+        </div>
+    
+        <div class="question-block" id="qblock_62">
+            <div class="question-title">Q63. What is the Kernal routine at $E544 typically used for?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q62" value="Reading a file" data-correct="Clearing the screen">
+                        Reading a file
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q62" value="Moving the cursor" data-correct="Clearing the screen">
+                        Moving the cursor
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q62" value="Clearing the screen" data-correct="Clearing the screen">
+                        Clearing the screen
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q62" value="Playing a sound" data-correct="Clearing the screen">
+                        Playing a sound
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q62">Correct Answer: Clearing the screen</div>
+        </div>
+    
+        <div class="question-block" id="qblock_63">
+            <div class="question-title">Q64. If the Carry flag is SET, what is the result of `ADC #$01` if the Accumulator holds $05?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q63" value="$07" data-correct="$07">
+                        $07
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q63" value="$06" data-correct="$07">
+                        $06
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q63" value="$08" data-correct="$07">
+                        $08
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q63" value="$05" data-correct="$07">
+                        $05
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q63">Correct Answer: $07</div>
+        </div>
+    
+        <div class="question-block" id="qblock_64">
+            <div class="question-title">Q65. If the Carry flag is CLEAR, what is the result of `SBC #$01` if the Accumulator holds $05?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q64" value="$06" data-correct="$03">
+                        $06
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q64" value="$03" data-correct="$03">
+                        $03
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q64" value="$05" data-correct="$03">
+                        $05
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q64" value="$04" data-correct="$03">
+                        $04
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q64">Correct Answer: $03</div>
+        </div>
+    <div class="level-header">Advanced (Questions 66 - 85)</div>
+
+        <div class="question-block" id="qblock_65">
+            <div class="question-title">Q66. Which VIC-II register is used to set a sprite into Multicolor mode?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q65" value="$D015" data-correct="$D01C">
+                        $D015
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q65" value="$D017" data-correct="$D01C">
+                        $D017
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q65" value="$D01C" data-correct="$D01C">
+                        $D01C
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q65" value="$D01D" data-correct="$D01C">
+                        $D01D
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q65">Correct Answer: $D01C</div>
+        </div>
+    
+        <div class="question-block" id="qblock_66">
+            <div class="question-title">Q67. Which VIC-II register expands a sprite to double its horizontal width?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q66" value="$D017" data-correct="$D01D">
+                        $D017
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q66" value="$D01C" data-correct="$D01D">
+                        $D01C
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q66" value="$D01D" data-correct="$D01D">
+                        $D01D
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q66" value="$D01E" data-correct="$D01D">
+                        $D01E
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q66">Correct Answer: $D01D</div>
+        </div>
+    
+        <div class="question-block" id="qblock_67">
+            <div class="question-title">Q68. Which VIC-II register expands a sprite to double its vertical height?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q67" value="$D01E" data-correct="$D017">
+                        $D01E
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q67" value="$D01D" data-correct="$D017">
+                        $D01D
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q67" value="$D01C" data-correct="$D017">
+                        $D01C
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q67" value="$D017" data-correct="$D017">
+                        $D017
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q67">Correct Answer: $D017</div>
+        </div>
+    
+        <div class="question-block" id="qblock_68">
+            <div class="question-title">Q69. Which SID register determines the waveform (Triangle, Sawtooth, Pulse, Noise) for Voice 1?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q68" value="$D404" data-correct="$D404">
+                        $D404
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q68" value="$D412" data-correct="$D404">
+                        $D412
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q68" value="$D400" data-correct="$D404">
+                        $D400
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q68" value="$D405" data-correct="$D404">
+                        $D405
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q68">Correct Answer: $D404</div>
+        </div>
+    
+        <div class="question-block" id="qblock_69">
+            <div class="question-title">Q70. What is 'Ring Modulation' in the context of the SID chip?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q69" value="Adding a delay effect to the sound" data-correct="Multiplying the output of one oscillator by another to create bell-like tones">
+                        Adding a delay effect to the sound
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q69" value="Multiplying the output of one oscillator by another to create bell-like tones" data-correct="Multiplying the output of one oscillator by another to create bell-like tones">
+                        Multiplying the output of one oscillator by another to create bell-like tones
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q69" value="Filtering high frequencies" data-correct="Multiplying the output of one oscillator by another to create bell-like tones">
+                        Filtering high frequencies
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q69" value="Modulating the global volume automatically" data-correct="Multiplying the output of one oscillator by another to create bell-like tones">
+                        Modulating the global volume automatically
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q69">Correct Answer: Multiplying the output of one oscillator by another to create bell-like tones</div>
+        </div>
+    
+        <div class="question-block" id="qblock_70">
+            <div class="question-title">Q71. Which CIA 2 port controls which 16KB memory bank the VIC-II can see?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q70" value="Timer A ($DD04)" data-correct="Port A ($DD00)">
+                        Timer A ($DD04)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q70" value="Port B ($DD01)" data-correct="Port A ($DD00)">
+                        Port B ($DD01)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q70" value="Data Direction Register ($DD02)" data-correct="Port A ($DD00)">
+                        Data Direction Register ($DD02)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q70" value="Port A ($DD00)" data-correct="Port A ($DD00)">
+                        Port A ($DD00)
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q70">Correct Answer: Port A ($DD00)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_71">
+            <div class="question-title">Q72. If CIA 2 Port A ($DD00) bits 0 and 1 are set to %11, which 16KB bank is the VIC-II viewing?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q71" value="Bank 1 ($4000 - $7FFF)" data-correct="Bank 0 ($0000 - $3FFF)">
+                        Bank 1 ($4000 - $7FFF)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q71" value="Bank 3 ($C000 - $FFFF)" data-correct="Bank 0 ($0000 - $3FFF)">
+                        Bank 3 ($C000 - $FFFF)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q71" value="Bank 0 ($0000 - $3FFF)" data-correct="Bank 0 ($0000 - $3FFF)">
+                        Bank 0 ($0000 - $3FFF)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q71" value="Bank 2 ($8000 - $BFFF)" data-correct="Bank 0 ($0000 - $3FFF)">
+                        Bank 2 ($8000 - $BFFF)
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q71">Correct Answer: Bank 0 ($0000 - $3FFF)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_72">
+            <div class="question-title">Q73. Where is the 6502 hardware NMI (Non-Maskable Interrupt) vector located?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q72" value="$FFFE / $FFFF" data-correct="$FFFA / $FFFB">
+                        $FFFE / $FFFF
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q72" value="$0318 / $0319" data-correct="$FFFA / $FFFB">
+                        $0318 / $0319
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q72" value="$FFFA / $FFFB" data-correct="$FFFA / $FFFB">
+                        $FFFA / $FFFB
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q72" value="$FFFC / $FFFD" data-correct="$FFFA / $FFFB">
+                        $FFFC / $FFFD
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q72">Correct Answer: $FFFA / $FFFB</div>
+        </div>
+    
+        <div class="question-block" id="qblock_73">
+            <div class="question-title">Q74. Where is the 6502 hardware RESET vector located?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q73" value="$FFFE / $FFFF" data-correct="$FFFC / $FFFD">
+                        $FFFE / $FFFF
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q73" value="$FFFC / $FFFD" data-correct="$FFFC / $FFFD">
+                        $FFFC / $FFFD
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q73" value="$0314 / $0315" data-correct="$FFFC / $FFFD">
+                        $0314 / $0315
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q73" value="$FFFA / $FFFB" data-correct="$FFFC / $FFFD">
+                        $FFFA / $FFFB
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q73">Correct Answer: $FFFC / $FFFD</div>
+        </div>
+    
+        <div class="question-block" id="qblock_74">
+            <div class="question-title">Q75. When writing a custom RAM IRQ handler while ROMs are active, which Kernal indirect vector is typically overwritten?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q74" value="$0316 / $0317" data-correct="$0314 / $0315">
+                        $0316 / $0317
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q74" value="$0314 / $0315" data-correct="$0314 / $0315">
+                        $0314 / $0315
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q74" value="$FFFE / $FFFF" data-correct="$0314 / $0315">
+                        $FFFE / $FFFF
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q74" value="$0318 / $0319" data-correct="$0314 / $0315">
+                        $0318 / $0319
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q74">Correct Answer: $0314 / $0315</div>
+        </div>
+    
+        <div class="question-block" id="qblock_75">
+            <div class="question-title">Q76. What action acknowledges (clears) a VIC-II Raster Interrupt request?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q75" value="Writing $00 to $D01A" data-correct="Writing a 1 to bit 0 of $D019">
+                        Writing $00 to $D01A
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q75" value="Executing a CLI instruction" data-correct="Writing a 1 to bit 0 of $D019">
+                        Executing a CLI instruction
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q75" value="Reading from $D012" data-correct="Writing a 1 to bit 0 of $D019">
+                        Reading from $D012
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q75" value="Writing a 1 to bit 0 of $D019" data-correct="Writing a 1 to bit 0 of $D019">
+                        Writing a 1 to bit 0 of $D019
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q75">Correct Answer: Writing a 1 to bit 0 of $D019</div>
+        </div>
+    
+        <div class="question-block" id="qblock_76">
+            <div class="question-title">Q77. What does clearing bit 4 of the VIC-II Screen Control Register 1 ($D011) achieve?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q76" value="It changes the screen to multicolor mode" data-correct="It turns the screen blank, displaying only the border color">
+                        It changes the screen to multicolor mode
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q76" value="It switches to bitmap mode" data-correct="It turns the screen blank, displaying only the border color">
+                        It switches to bitmap mode
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q76" value="It disables all sprites" data-correct="It turns the screen blank, displaying only the border color">
+                        It disables all sprites
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q76" value="It turns the screen blank, displaying only the border color" data-correct="It turns the screen blank, displaying only the border color">
+                        It turns the screen blank, displaying only the border color
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q76">Correct Answer: It turns the screen blank, displaying only the border color</div>
+        </div>
+    
+        <div class="question-block" id="qblock_77">
+            <div class="question-title">Q78. How many clock cycles does the instruction `INC $D019` take to execute?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q77" value="5 cycles" data-correct="6 cycles">
+                        5 cycles
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q77" value="7 cycles" data-correct="6 cycles">
+                        7 cycles
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q77" value="4 cycles" data-correct="6 cycles">
+                        4 cycles
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q77" value="6 cycles" data-correct="6 cycles">
+                        6 cycles
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q77">Correct Answer: 6 cycles</div>
+        </div>
+    
+        <div class="question-block" id="qblock_78">
+            <div class="question-title">Q79. What common instruction sequence is used in raster routines to create exact, cycle-precise delay loops?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q78" value="LDX #$xx / DEX / BNE" data-correct="LDX #$xx / DEX / BNE">
+                        LDX #$xx / DEX / BNE
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q78" value="JSR delay" data-correct="LDX #$xx / DEX / BNE">
+                        JSR delay
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q78" value="NOP / NOP / NOP" data-correct="LDX #$xx / DEX / BNE">
+                        NOP / NOP / NOP
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q78" value="PHA / PLA" data-correct="LDX #$xx / DEX / BNE">
+                        PHA / PLA
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q78">Correct Answer: LDX #$xx / DEX / BNE</div>
+        </div>
+    
+        <div class="question-block" id="qblock_79">
+            <div class="question-title">Q80. What is the pixel resolution of the standard C64 Hi-Res bitmap mode?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q79" value="320 x 240" data-correct="320 x 200">
+                        320 x 240
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q79" value="320 x 200" data-correct="320 x 200">
+                        320 x 200
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q79" value="640 x 200" data-correct="320 x 200">
+                        640 x 200
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q79" value="160 x 200" data-correct="320 x 200">
+                        160 x 200
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q79">Correct Answer: 320 x 200</div>
+        </div>
+    
+        <div class="question-block" id="qblock_80">
+            <div class="question-title">Q81. What is the pixel resolution of the C64 Multicolor bitmap mode?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q80" value="160 x 240" data-correct="160 x 200">
+                        160 x 240
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q80" value="160 x 200" data-correct="160 x 200">
+                        160 x 200
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q80" value="320 x 400" data-correct="160 x 200">
+                        320 x 400
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q80" value="320 x 200" data-correct="160 x 200">
+                        320 x 200
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q80">Correct Answer: 160 x 200</div>
+        </div>
+    
+        <div class="question-block" id="qblock_81">
+            <div class="question-title">Q82. In standard text mode, how many colors can be uniquely assigned to a single 8x8 character block?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q81" value="2 (Background and Foreground)" data-correct="2 (Background and Foreground)">
+                        2 (Background and Foreground)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q81" value="16" data-correct="2 (Background and Foreground)">
+                        16
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q81" value="4" data-correct="2 (Background and Foreground)">
+                        4
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q81" value="1" data-correct="2 (Background and Foreground)">
+                        1
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q81">Correct Answer: 2 (Background and Foreground)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_82">
+            <div class="question-title">Q83. In multicolor text mode, how many colors can be used within a single 4x8 character block?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q82" value="4 colors" data-correct="4 colors">
+                        4 colors
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q82" value="16 colors" data-correct="4 colors">
+                        16 colors
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q82" value="2 colors" data-correct="4 colors">
+                        2 colors
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q82" value="8 colors" data-correct="4 colors">
+                        8 colors
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q82">Correct Answer: 4 colors</div>
+        </div>
+    
+        <div class="question-block" id="qblock_83">
+            <div class="question-title">Q84. Which hardware register controls the master volume and filter selection of the SID chip?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q83" value="$D404" data-correct="$D418">
+                        $D404
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q83" value="$D412" data-correct="$D418">
+                        $D412
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q83" value="$D418" data-correct="$D418">
+                        $D418
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q83" value="$D400" data-correct="$D418">
+                        $D400
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q83">Correct Answer: $D418</div>
+        </div>
+    
+        <div class="question-block" id="qblock_84">
+            <div class="question-title">Q85. What happens if you execute an RTI instruction without having pushed a processor status and return address to the stack?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q84" value="It resets the C64" data-correct="The CPU pulls garbage data, usually leading to a crash">
+                        It resets the C64
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q84" value="It acts as an RTS instead" data-correct="The CPU pulls garbage data, usually leading to a crash">
+                        It acts as an RTS instead
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q84" value="The CPU pulls garbage data, usually leading to a crash" data-correct="The CPU pulls garbage data, usually leading to a crash">
+                        The CPU pulls garbage data, usually leading to a crash
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q84" value="The CPU ignores it" data-correct="The CPU pulls garbage data, usually leading to a crash">
+                        The CPU ignores it
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q84">Correct Answer: The CPU pulls garbage data, usually leading to a crash</div>
+        </div>
+    <div class="level-header">Expert (Questions 86 - 100)</div>
+
+        <div class="question-block" id="qblock_85">
+            <div class="question-title">Q86. What causes the dreaded 'VSP Bug' (Variable Screen Positioning bug) that can crash some C64s?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q85" value="A divide-by-zero error in the ALU" data-correct="DRAM refresh failure due to manipulated VIC-II memory fetch cycles">
+                        A divide-by-zero error in the ALU
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q85" value="An infinite loop in the NMI handler" data-correct="DRAM refresh failure due to manipulated VIC-II memory fetch cycles">
+                        An infinite loop in the NMI handler
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q85" value="DRAM refresh failure due to manipulated VIC-II memory fetch cycles" data-correct="DRAM refresh failure due to manipulated VIC-II memory fetch cycles">
+                        DRAM refresh failure due to manipulated VIC-II memory fetch cycles
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q85" value="Overheating of the SID chip" data-correct="DRAM refresh failure due to manipulated VIC-II memory fetch cycles">
+                        Overheating of the SID chip
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q85">Correct Answer: DRAM refresh failure due to manipulated VIC-II memory fetch cycles</div>
+        </div>
+    
+        <div class="question-block" id="qblock_86">
+            <div class="question-title">Q87. Exactly how many clock cycles are there in a standard PAL C64 raster line?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q86" value="65" data-correct="63">
+                        65
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q86" value="63" data-correct="63">
+                        63
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q86" value="64" data-correct="63">
+                        64
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q86" value="62" data-correct="63">
+                        62
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q86">Correct Answer: 63</div>
+        </div>
+    
+        <div class="question-block" id="qblock_87">
+            <div class="question-title">Q88. Exactly how many clock cycles are there in a standard NTSC C64 raster line?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q87" value="63" data-correct="65">
+                        63
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q87" value="66" data-correct="65">
+                        66
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q87" value="64" data-correct="65">
+                        64
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q87" value="65" data-correct="65">
+                        65
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q87">Correct Answer: 65</div>
+        </div>
+    
+        <div class="question-block" id="qblock_88">
+            <div class="question-title">Q89. Which illegal opcode performs a bitwise AND between the Accumulator and memory, then shifts the result right (LSR)?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q88" value="SAX" data-correct="ALR (or ASR)">
+                        SAX
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q88" value="ARR" data-correct="ALR (or ASR)">
+                        ARR
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q88" value="ALR (or ASR)" data-correct="ALR (or ASR)">
+                        ALR (or ASR)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q88" value="ANC" data-correct="ALR (or ASR)">
+                        ANC
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q88">Correct Answer: ALR (or ASR)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_89">
+            <div class="question-title">Q90. Which illegal opcode stores (A AND X) into memory, then subtracts an immediate value into X?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q89" value="ISB" data-correct="SBX (or AXS)">
+                        ISB
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q89" value="SBX (or AXS)" data-correct="SBX (or AXS)">
+                        SBX (or AXS)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q89" value="LAX" data-correct="SBX (or AXS)">
+                        LAX
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q89" value="DCP" data-correct="SBX (or AXS)">
+                        DCP
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q89">Correct Answer: SBX (or AXS)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_90">
+            <div class="question-title">Q91. Achieving an 'Open Border' in the horizontal direction explicitly depends on changing which register at a precise cycle?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q90" value="The raster counter in $D012" data-correct="The 38/40 column bit in $D016">
+                        The raster counter in $D012
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q90" value="The 38/40 column bit in $D016" data-correct="The 38/40 column bit in $D016">
+                        The 38/40 column bit in $D016
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q90" value="The border color in $D020" data-correct="The 38/40 column bit in $D016">
+                        The border color in $D020
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q90" value="The screen blank bit in $D011" data-correct="The 38/40 column bit in $D016">
+                        The screen blank bit in $D011
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q90">Correct Answer: The 38/40 column bit in $D016</div>
+        </div>
+    
+        <div class="question-block" id="qblock_91">
+            <div class="question-title">Q92. How many clock cycles does a single sprite fetch steal from the CPU on a specific raster line?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q91" value="8 cycles" data-correct="2 cycles">
+                        8 cycles
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q91" value="1 cycle" data-correct="2 cycles">
+                        1 cycle
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q91" value="4 cycles" data-correct="2 cycles">
+                        4 cycles
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q91" value="2 cycles" data-correct="2 cycles">
+                        2 cycles
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q91">Correct Answer: 2 cycles</div>
+        </div>
+    
+        <div class="question-block" id="qblock_92">
+            <div class="question-title">Q93. Without any DMA chip, how must a C64 coder quickly clear the entire 64KB of RAM?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q92" value="By triggering a VIC-II blanking glitch" data-correct="Using a highly unrolled CPU loop (e.g., repeating STA)">
+                        By triggering a VIC-II blanking glitch
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q92" value="Using a Kernal hardware call" data-correct="Using a highly unrolled CPU loop (e.g., repeating STA)">
+                        Using a Kernal hardware call
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q92" value="Using a highly unrolled CPU loop (e.g., repeating STA)" data-correct="Using a highly unrolled CPU loop (e.g., repeating STA)">
+                        Using a highly unrolled CPU loop (e.g., repeating STA)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q92" value="By asserting the Reset line" data-correct="Using a highly unrolled CPU loop (e.g., repeating STA)">
+                        By asserting the Reset line
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q92">Correct Answer: Using a highly unrolled CPU loop (e.g., repeating STA)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_93">
+            <div class="question-title">Q94. During which precise cycle range on a raster line does the VIC-II fetch data for Sprite 0?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q93" value="Cycles 55 - 56" data-correct="Cycles 55 - 56">
+                        Cycles 55 - 56
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q93" value="Cycles 20 - 21" data-correct="Cycles 55 - 56">
+                        Cycles 20 - 21
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q93" value="Cycles 60 - 61" data-correct="Cycles 55 - 56">
+                        Cycles 60 - 61
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q93" value="Cycles 1 - 2" data-correct="Cycles 55 - 56">
+                        Cycles 1 - 2
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q93">Correct Answer: Cycles 55 - 56</div>
+        </div>
+    
+        <div class="question-block" id="qblock_94">
+            <div class="question-title">Q95. Why is the immediate addressing mode of the illegal opcode `LAX #$xx` sometimes avoided in productions?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q94" value="It is highly unstable and dependent on manufacturing lines/temperature ('magic constant' noise)" data-correct="It is highly unstable and dependent on manufacturing lines/temperature ('magic constant' noise)">
+                        It is highly unstable and dependent on manufacturing lines/temperature ('magic constant' noise)
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q94" value="It always sets the Carry flag" data-correct="It is highly unstable and dependent on manufacturing lines/temperature ('magic constant' noise)">
+                        It always sets the Carry flag
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q94" value="It destroys the Y register" data-correct="It is highly unstable and dependent on manufacturing lines/temperature ('magic constant' noise)">
+                        It destroys the Y register
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q94" value="It takes 7 cycles to execute" data-correct="It is highly unstable and dependent on manufacturing lines/temperature ('magic constant' noise)">
+                        It takes 7 cycles to execute
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q94">Correct Answer: It is highly unstable and dependent on manufacturing lines/temperature ('magic constant' noise)</div>
+        </div>
+    
+        <div class="question-block" id="qblock_95">
+            <div class="question-title">Q96. In what exact state are the CPU flags immediately after a hardware power-on reset?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q95" value="All flags are set to 1" data-correct="Unknown/Random, except the Interrupt Disable (I) flag is set">
+                        All flags are set to 1
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q95" value="Unknown/Random, except the Interrupt Disable (I) flag is set" data-correct="Unknown/Random, except the Interrupt Disable (I) flag is set">
+                        Unknown/Random, except the Interrupt Disable (I) flag is set
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q95" value="All flags are cleared to 0" data-correct="Unknown/Random, except the Interrupt Disable (I) flag is set">
+                        All flags are cleared to 0
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q95" value="Only the Zero flag is set" data-correct="Unknown/Random, except the Interrupt Disable (I) flag is set">
+                        Only the Zero flag is set
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q95">Correct Answer: Unknown/Random, except the Interrupt Disable (I) flag is set</div>
+        </div>
+    
+        <div class="question-block" id="qblock_96">
+            <div class="question-title">Q97. What is the fundamental difference between the 6510's internal registers at $00 and $01?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q96" value="$00 is for the Tape drive, $01 is for the Serial bus" data-correct="$00 is the Data Direction Register, $01 is the Data Port">
+                        $00 is for the Tape drive, $01 is for the Serial bus
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q96" value="There is no difference; they are mirrors" data-correct="$00 is the Data Direction Register, $01 is the Data Port">
+                        There is no difference; they are mirrors
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q96" value="$00 handles RAM, $01 handles ROM" data-correct="$00 is the Data Direction Register, $01 is the Data Port">
+                        $00 handles RAM, $01 handles ROM
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q96" value="$00 is the Data Direction Register, $01 is the Data Port" data-correct="$00 is the Data Direction Register, $01 is the Data Port">
+                        $00 is the Data Direction Register, $01 is the Data Port
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q96">Correct Answer: $00 is the Data Direction Register, $01 is the Data Port</div>
+        </div>
+    
+        <div class="question-block" id="qblock_97">
+            <div class="question-title">Q98. If you completely bank out the Kernal ROM via $01, what must you do to ensure hardware interrupts don't crash the machine?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q97" value="Disable interrupts completely with SEI forever" data-correct="Provide valid interrupt vectors in RAM at $FFFA-$FFFF">
+                        Disable interrupts completely with SEI forever
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q97" value="Write 0 to $D01A" data-correct="Provide valid interrupt vectors in RAM at $FFFA-$FFFF">
+                        Write 0 to $D01A
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q97" value="Mask the NMI timer in CIA 2" data-correct="Provide valid interrupt vectors in RAM at $FFFA-$FFFF">
+                        Mask the NMI timer in CIA 2
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q97" value="Provide valid interrupt vectors in RAM at $FFFA-$FFFF" data-correct="Provide valid interrupt vectors in RAM at $FFFA-$FFFF">
+                        Provide valid interrupt vectors in RAM at $FFFA-$FFFF
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q97">Correct Answer: Provide valid interrupt vectors in RAM at $FFFA-$FFFF</div>
+        </div>
+    
+        <div class="question-block" id="qblock_98">
+            <div class="question-title">Q99. What does the highly specialized illegal opcode `SHX` (or `SYA`) do?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q98" value="Halts the CPU until a hardware interrupt" data-correct="Stores X ANDed with the high byte of the target address + 1">
+                        Halts the CPU until a hardware interrupt
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q98" value="Shifts X right and sets the Carry" data-correct="Stores X ANDed with the high byte of the target address + 1">
+                        Shifts X right and sets the Carry
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q98" value="Stores X ANDed with the high byte of the target address + 1" data-correct="Stores X ANDed with the high byte of the target address + 1">
+                        Stores X ANDed with the high byte of the target address + 1
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q98" value="Swaps the High and Low bytes of the Accumulator" data-correct="Stores X ANDed with the high byte of the target address + 1">
+                        Swaps the High and Low bytes of the Accumulator
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q98">Correct Answer: Stores X ANDed with the high byte of the target address + 1</div>
+        </div>
+    
+        <div class="question-block" id="qblock_99">
+            <div class="question-title">Q100. How can you trick the VIC-II into drawing no background/character graphics, displaying only the border color over the entire screen area?</div>
+            <ul class="options">
+    
+                <li>
+                    <label>
+                        <input type="radio" name="q99" value="By moving the screen RAM to an empty bank" data-correct="By clearing bit 4 of $D011 (Screen Blanking)">
+                        By moving the screen RAM to an empty bank
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q99" value="By setting all color RAM to the border color" data-correct="By clearing bit 4 of $D011 (Screen Blanking)">
+                        By setting all color RAM to the border color
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q99" value="By changing the character set pointer to $0000" data-correct="By clearing bit 4 of $D011 (Screen Blanking)">
+                        By changing the character set pointer to $0000
+                    </label>
+                </li>
+        
+                <li>
+                    <label>
+                        <input type="radio" name="q99" value="By clearing bit 4 of $D011 (Screen Blanking)" data-correct="By clearing bit 4 of $D011 (Screen Blanking)">
+                        By clearing bit 4 of $D011 (Screen Blanking)
+                    </label>
+                </li>
+        
+            </ul>
+            <div class="explanation" id="exp_q99">Correct Answer: By clearing bit 4 of $D011 (Screen Blanking)</div>
+        </div>
+    
+        <button type="button" onclick="calculateScore()">Submit Test</button>
+    </form>
+    
+    <div id="results"></div>
+</div>
+
+<script>
+function calculateScore() {
+    let score = 0;
+    const total = 100;
+    
+    for (let i = 0; i < total; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        const block = document.getElementById(`qblock_${i}`);
+        const exp = document.getElementById(`exp_q${i}`);
+        
+        if (selected) {
+            const isCorrect = selected.value === selected.getAttribute('data-correct');
+            if (isCorrect) {
+                score++;
+                selected.parentElement.style.backgroundColor = 'rgba(152, 195, 121, 0.4)'; // green
+            } else {
+                selected.parentElement.style.backgroundColor = 'rgba(224, 108, 117, 0.4)'; // red
+                exp.style.display = 'block';
+            }
+        } else {
+            exp.style.display = 'block';
+        }
+        
+        // Disable inputs after submit
+        const inputs = block.querySelectorAll('input');
+        inputs.forEach(input => input.disabled = true);
+    }
+    
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.style.display = 'block';
+    
+    let message = "";
+    if (score >= 90) message = "6510 God Tier!";
+    else if (score >= 70) message = "Elite Scener!";
+    else if (score >= 50) message = "Sysop Level!";
+    else if (score >= 30) message = "Newbie Coder.";
+    else message = "Guru Meditation Error. Time to read the C64 Programmer's Reference Guide!";
+    
+    resultsDiv.innerHTML = `You scored ${score} out of ${total}!<br><span style="font-size:0.8em; color:#e5c07b;">${message}</span>`;
+    
+    // Scroll to results
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
