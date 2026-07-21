@@ -1,4 +1,4 @@
-0.9.9.92
+0.9.9.93
 2026-05-15
 https://polytricity.itch.io/the-c64-dev-machine
 Initial version check file.
