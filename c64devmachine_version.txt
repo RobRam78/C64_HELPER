@@ -1,4 +1,4 @@
-1.1.7
+1.1.8
 2026-05-15
 https://polytricity.itch.io/the-c64-dev-machine
 Initial version check file.
